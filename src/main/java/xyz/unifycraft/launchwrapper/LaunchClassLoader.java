@@ -10,6 +10,9 @@ import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.util.*;
 
+/**
+ * Adapted from GlassMC Loader under the MIT license
+ */
 public class LaunchClassLoader extends URLClassLoader {
     private final Set<String> classLoaderExceptions = new HashSet<>();
     private final Set<String> transformationExceptions = new HashSet<>();

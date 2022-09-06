@@ -4,18 +4,17 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.InvalidClassException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 public class LaunchTransformers {
     private static boolean initialized = false;
     private static final Logger LOGGER = LogManager.getLogger("LaunchTransformers");
 
-    private static final List<LaunchTransformer> transformers = new ArrayList<>();
+    private static final List<LaunchTransformer> transformers = new CopyOnWriteArrayList<>();
 
     public static void initialize(ArgumentMap argMap) {
         if (initialized)

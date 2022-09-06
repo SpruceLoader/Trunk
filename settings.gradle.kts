@@ -17,6 +17,7 @@ pluginManagement {
     }
 }
 
-rootProject.name = "UniLaunchwrapper"
+rootProject.name =
+    extra["project.name"]?.toString() ?: throw IllegalArgumentException("The project name has not been set.")
 
 include(":minecraft-test")

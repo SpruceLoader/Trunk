@@ -6,7 +6,7 @@ import xyz.unifycraft.launchwrapper.api.EnvSide;
 import xyz.unifycraft.launchwrapper.api.LaunchTransformer;
 import xyz.unifycraft.launchwrapper.utils.MappingConfiguration;
 
-public class InternalLaunchTransformer implements LaunchTransformer {
+class InternalLaunchTransformer implements LaunchTransformer {
     public void takeArguments(ArgumentMap argMap, EnvSide env) {
     }
 

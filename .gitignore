@@ -28,7 +28,7 @@ build
 .gradle
 
 # other
-run
+**/run
 .DS_Store
 Thumbs.db
 **/old-*
