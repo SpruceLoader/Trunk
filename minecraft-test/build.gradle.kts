@@ -1,12 +1,17 @@
+import net.fabricmc.loom.LoomGradleExtension
+
 plugins {
     java
-    id("xyz.unifycraft.uniloom") version("1.0.0-beta.12")
+    id("xyz.unifycraft.uniloom") version("1.0.0-beta.16")
 }
 
 val launch by configurations.creating {
     configurations.implementation.get().extendsFrom(this)
     configurations.modCompileClasspath.get().extendsFrom(this)
 }
+
+if (loom is LoomGradleExtension)
+    (loom as LoomGradleExtension).useInstallerData("1", file("installer-data.json"))
 
 repositories {
     mavenCentral()
