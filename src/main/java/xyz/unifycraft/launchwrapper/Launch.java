@@ -45,7 +45,6 @@ public class Launch {
 
     public void initialize(ArgumentMap argMap, EnvSide env) {
         String[] argsArray = argMap.toArray();
-        System.out.println("Tiny file: " + Launch.class.getClassLoader().getResource("mappings/mappings.tiny"));
         logger.info("Launching Minecraft with UniLoader Launchwrapper");
 
         LaunchTransformers.addTransformer(new InternalLaunchTransformer());

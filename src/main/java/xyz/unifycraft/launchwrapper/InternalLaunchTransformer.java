@@ -21,8 +21,6 @@ public class InternalLaunchTransformer implements LaunchTransformer {
         boolean mustTransformAccess = isMinecraftClass && MappingConfiguration.getInstance().requiresPackageAccessHack();
         if (!mustTransformAccess) return rawClass;
 
-        System.out.println("Transforming class: " + className);
-
         ClassReader classReader = new ClassReader(rawClass);
         ClassWriter classWriter = new ClassWriter(classReader, 0);
         ClassVisitor visitor = classWriter;
