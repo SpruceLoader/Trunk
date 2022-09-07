@@ -44,7 +44,6 @@ public class Launch {
     }
 
     public void initialize(ArgumentMap argMap, EnvSide env) {
-        String[] argsArray = argMap.toArray();
         logger.info("Launching Minecraft with UniLoader Launchwrapper");
 
         LaunchTransformers.addTransformer(new InternalLaunchTransformer());
@@ -56,9 +55,7 @@ public class Launch {
             classLoader.addClassLoaderException(transformerClassName.contains(".") ? transformerClassName.substring(0, transformerClassName.lastIndexOf('.')) : transformerClassName);
         });
 
-        launch(argsArray, env);
-
-        LaunchTransformers.performTask(LaunchTransformer::setupPostClassPath);
+        launch(argMap.toArray(), env);
     }
 
     private void setupClassPath() {

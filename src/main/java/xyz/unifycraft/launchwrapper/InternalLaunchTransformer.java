@@ -10,9 +10,6 @@ class InternalLaunchTransformer implements LaunchTransformer {
     public void takeArguments(ArgumentMap argMap, EnvSide env) {
     }
 
-    public void setupPostClassPath() {
-    }
-
     /**
      * Adapted from Fabric Loader under Apache License 2.0
      */

@@ -2,7 +2,7 @@ import net.fabricmc.loom.LoomGradleExtension
 
 plugins {
     java
-    id("xyz.unifycraft.uniloom") version("1.0.0-beta.16")
+    id("xyz.unifycraft.uniloom") version("1.0.0-beta.17")
 }
 
 val launch by configurations.creating {

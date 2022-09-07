@@ -29,7 +29,7 @@ public class LaunchTransformers {
             if (!propValues.isEmpty()) propValues.forEach(name -> transformers.add(fromName(name)));
         }
 
-        transformers.addAll(transformers.stream().filter(Objects::nonNull).toList());
+        transformers.removeIf(Objects::isNull);
 
         argMap.remove("launchListener");
         initialized = true;
