@@ -20,18 +20,9 @@ public class LaunchTransformers {
         if (initialized)
             throw new IllegalStateException("Cannot initialize launch listeners twice!");
 
-        List<String> argValues = argMap.getAll("launchListener");
-        if (argValues != null) argValues.forEach(name -> transformers.add(fromName(name)));
+        handleFromNamespaces(argMap, "launchListener", "unilaunchwrapper.listeners");
+        handleFromNamespaces(argMap, "launchTransformer", "unilaunchwrapper.transformers");
 
-        String prop = System.getProperty("unilaunchwrapper.listeners");
-        if (prop != null) {
-            List<String> propValues = Arrays.stream(prop.split("/")).toList();
-            if (!propValues.isEmpty()) propValues.forEach(name -> transformers.add(fromName(name)));
-        }
-
-        transformers.removeIf(Objects::isNull);
-
-        argMap.remove("launchListener");
         initialized = true;
     }
 
@@ -47,10 +38,24 @@ public class LaunchTransformers {
         return transformers;
     }
 
+    private static void handleFromNamespaces(ArgumentMap argMap, String argName, String propName) {
+        List<String> argValues = argMap.getAll(argName);
+        if (argValues != null) argValues.forEach(name -> transformers.add(fromName(name)));
+
+        String prop = System.getProperty(propName);
+        if (prop != null) {
+            List<String> propValues = Arrays.stream(prop.split("/")).toList();
+            if (!propValues.isEmpty()) propValues.forEach(name -> transformers.add(fromName(name)));
+        }
+
+        transformers.removeIf(Objects::isNull);
+        argMap.remove(argName);
+    }
+
     private static LaunchTransformer fromName(String name) {
         try {
             Class<?> clz = Class.forName(name, true, LaunchTransformers.class.getClassLoader());
-            if (!LaunchTransformer.class.isAssignableFrom(clz)) throw new InvalidClassException("The class provided isn't a launch listener!");
+            if (!LaunchTransformer.class.isAssignableFrom(clz)) throw new InvalidClassException("The class provided isn't a launch transformer!");
             LaunchTransformer instance = (LaunchTransformer) clz.getConstructor().newInstance();
             return instance;
         } catch (InvalidClassException e) {

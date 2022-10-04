@@ -59,7 +59,7 @@ public class ArgumentMap {
             int index = input.indexOf(arg);
             if (input.size() - 1 < index || !arg.startsWith("--")) continue;
 
-            String value = input.get(index + 1);
+            String value = index + 1 >= input.size() ? "" : input.get(index + 1);
             if (value.startsWith("--")) value = ""; // This is an empty argument
 
             String name = arg.substring(2); // Remove the arg name identifier

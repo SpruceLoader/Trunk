@@ -1,18 +1,15 @@
 package xyz.unifycraft.launchwrapper;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import xyz.unifycraft.launchwrapper.api.ArgumentMap;
 import xyz.unifycraft.launchwrapper.api.EnvSide;
-import xyz.unifycraft.launchwrapper.api.LaunchTransformer;
 import xyz.unifycraft.launchwrapper.api.LaunchTransformers;
 
 import java.io.File;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
-import java.lang.reflect.Method;
-import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -24,7 +21,7 @@ import java.util.stream.Collectors;
 
 public class Launch {
     private static Launch INSTANCE;
-    private static Logger logger = LogManager.getLogger("Launchwrapper");
+    private static Logger logger = LoggerFactory.getLogger("Launchwrapper");
 
     private boolean development = Boolean.getBoolean("launch.development");
 
@@ -87,8 +84,8 @@ public class Launch {
     private void launch(String[] args, EnvSide env) {
         try {
             Class<?> clz = Class.forName(env.getLaunchClass(), false, classLoader);
-            Method method = clz.getMethod("main", String[].class);
-            method.invoke(null, (Object) args);
+            MethodHandle handle = MethodHandles.publicLookup().findStatic(clz, "main", MethodType.methodType(void.class, String[].class));
+            handle.invoke((Object) args);
         } catch (Throwable t) {
             throw new RuntimeException("Failed to launch Minecraft!", t);
         }
