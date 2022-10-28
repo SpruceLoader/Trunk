@@ -1,16 +1,16 @@
-package xyz.unifycraft.launchwrapper;
+package xyz.spruceloader.launchwrapper;
 
-import xyz.unifycraft.launchwrapper.api.ArgumentMap;
-import xyz.unifycraft.launchwrapper.api.EnvSide;
+import xyz.spruceloader.launchwrapper.api.ArgumentMap;
+import xyz.spruceloader.launchwrapper.api.EnvSide;
 
-import java.io.File;
+import java.nio.file.Paths;
 
 public class MainClient {
     public static void main(String[] args) {
         ArgumentMap argMap = ArgumentMap.parse(args);
         argMap.putIfAbsent("accessToken", "None");
         argMap.putIfAbsent("version", "Unknown");
-        argMap.putIfAbsent("gameDir", new File(".").getAbsolutePath());
+        argMap.putIfAbsent("gameDir", Paths.get(".").normalize().toString());
         Launch.getInstance().initialize(argMap, EnvSide.CLIENT);
     }
 }

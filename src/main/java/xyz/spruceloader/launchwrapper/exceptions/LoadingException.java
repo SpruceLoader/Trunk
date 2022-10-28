@@ -1,4 +1,4 @@
-package xyz.unifycraft.launchwrapper.exceptions;
+package xyz.spruceloader.launchwrapper.exceptions;
 
 public class LoadingException extends RuntimeException {
     public LoadingException(String message, Throwable cause) {

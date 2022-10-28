@@ -1,4 +1,4 @@
-package xyz.unifycraft.launchwrapper.api;
+package xyz.spruceloader.launchwrapper.api;
 
 import java.util.*;
 

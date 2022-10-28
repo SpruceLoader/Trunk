@@ -1,9 +1,9 @@
-package xyz.unifycraft.launchwrapper;
+package xyz.spruceloader.launchwrapper;
 
 import org.apache.commons.io.IOUtils;
-import xyz.unifycraft.launchwrapper.api.LaunchTransformer;
-import xyz.unifycraft.launchwrapper.api.LaunchTransformers;
-import xyz.unifycraft.launchwrapper.exceptions.LoadingException;
+import xyz.spruceloader.launchwrapper.api.LaunchTransformers;
+import xyz.spruceloader.launchwrapper.api.LaunchTransformer;
+import xyz.spruceloader.launchwrapper.exceptions.LoadingException;
 
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -34,7 +34,7 @@ public class LaunchClassLoader extends URLClassLoader {
         addClassLoaderException("org.slf4j.");
         addClassLoaderException("com.mojang.blocklist.");
 
-        addClassLoaderException("xyz.unifycraft.launchwrapper.");
+        addClassLoaderException("xyz.spruceloader.launchwrapper.");
     }
 
     protected void addPath(Path path) {
@@ -48,7 +48,6 @@ public class LaunchClassLoader extends URLClassLoader {
     public Class<?> loadClass(String name) throws ClassNotFoundException {
         if (classLoaderExceptions.stream().anyMatch(name::startsWith))
             return getParent().loadClass(name);
-
         if (classCache.containsKey(name))
             return classCache.get(name);
 

@@ -1,4 +1,4 @@
-package xyz.unifycraft.launchwrapper.utils;
+package xyz.spruceloader.launchwrapper.utils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,7 +12,7 @@ import java.util.zip.ZipError;
 
 import net.fabricmc.mapping.tree.TinyMappingFactory;
 import net.fabricmc.mapping.tree.TinyTree;
-import xyz.unifycraft.launchwrapper.Launch;
+import xyz.spruceloader.launchwrapper.Launch;
 
 /**
  * Adapted from Fabric Loader under Apache License 2.0

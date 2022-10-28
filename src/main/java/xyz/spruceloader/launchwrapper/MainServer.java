@@ -1,7 +1,7 @@
-package xyz.unifycraft.launchwrapper;
+package xyz.spruceloader.launchwrapper;
 
-import xyz.unifycraft.launchwrapper.api.ArgumentMap;
-import xyz.unifycraft.launchwrapper.api.EnvSide;
+import xyz.spruceloader.launchwrapper.api.ArgumentMap;
+import xyz.spruceloader.launchwrapper.api.EnvSide;
 
 public class MainServer {
     public static void main(String[] args) {

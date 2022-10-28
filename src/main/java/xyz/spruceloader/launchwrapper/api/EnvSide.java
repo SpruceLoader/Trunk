@@ -1,4 +1,4 @@
-package xyz.unifycraft.launchwrapper.api;
+package xyz.spruceloader.launchwrapper.api;
 
 public enum EnvSide {
     CLIENT("net.minecraft.client.main.Main"),

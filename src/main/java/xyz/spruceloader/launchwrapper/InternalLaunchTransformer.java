@@ -1,13 +1,18 @@
-package xyz.unifycraft.launchwrapper;
+package xyz.spruceloader.launchwrapper;
 
 import org.objectweb.asm.*;
-import xyz.unifycraft.launchwrapper.api.ArgumentMap;
-import xyz.unifycraft.launchwrapper.api.EnvSide;
-import xyz.unifycraft.launchwrapper.api.LaunchTransformer;
-import xyz.unifycraft.launchwrapper.utils.MappingConfiguration;
+import xyz.spruceloader.launchwrapper.api.ArgumentMap;
+import xyz.spruceloader.launchwrapper.utils.MappingConfiguration;
+import xyz.spruceloader.launchwrapper.api.EnvSide;
+import xyz.spruceloader.launchwrapper.api.LaunchTransformer;
 
 class InternalLaunchTransformer implements LaunchTransformer {
     public void takeArguments(ArgumentMap argMap, EnvSide env) {
+        // no-op
+    }
+
+    public void injectIntoClassLoader(LaunchClassLoader classLoader) {
+        // no-op
     }
 
     /**

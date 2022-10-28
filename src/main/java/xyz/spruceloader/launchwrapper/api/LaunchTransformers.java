@@ -1,4 +1,4 @@
-package xyz.unifycraft.launchwrapper.api;
+package xyz.spruceloader.launchwrapper.api;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -20,9 +20,7 @@ public class LaunchTransformers {
         if (initialized)
             throw new IllegalStateException("Cannot initialize launch listeners twice!");
 
-        handleFromNamespaces(argMap, "launchListener", "unilaunchwrapper.listeners");
-        handleFromNamespaces(argMap, "launchTransformer", "unilaunchwrapper.transformers");
-
+        handleFromNamespaces(argMap, "launchTransformer", "launch.transformers");
         initialized = true;
     }
 
