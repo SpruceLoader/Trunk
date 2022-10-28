@@ -35,6 +35,7 @@ public class Launch {
             }
         }).filter(Objects::nonNull).collect(Collectors.toList()), getClass().getClassLoader());
         Thread.currentThread().setContextClassLoader(classLoader);
+        globalProperties.put("launch.development", DEVELOPMENT);
     }
 
     public void initialize(ArgumentMap argMap, EnvSide env) {

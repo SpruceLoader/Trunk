@@ -3,10 +3,8 @@ plugins {
     `maven-publish`
 }
 
-group =
-    extra["project.group"]?.toString() ?: throw IllegalArgumentException("The project group has not been set.")
-version =
-    extra["project.version"]?.toString() ?: throw IllegalArgumentException("The project version has not been set.")
+group = extra["project.group"]?.toString() ?: throw IllegalArgumentException("The project group has not been set.")
+version = extra["project.version"]?.toString() ?: throw IllegalArgumentException("The project version has not been set.")
 
 repositories {
     mavenCentral()
@@ -16,7 +14,7 @@ repositories {
 
 dependencies {
     implementation("commons-io:commons-io:2.11.0")
-    implementation("org.ow2.asm:asm-tree:9.3")
+    implementation("org.ow2.asm:asm-tree:9.4")
     implementation("net.fabricmc:tiny-mappings-parser:0.3.0+build.17")
 
     compileOnly("org.apache.logging.log4j:log4j-api:2.8.1")
@@ -40,24 +38,24 @@ publishing {
     }
 
     repositories {
-        if (project.hasProperty("unifycraft.publishing.username") && project.hasProperty("unifycraft.publishing.password")) {
+        if (project.hasProperty("spruceloader.publishing.username") && project.hasProperty("spruceloader.publishing.password")) {
             fun MavenArtifactRepository.applyCredentials() {
                 authentication.create<BasicAuthentication>("basic")
                 credentials {
-                    username = property("unifycraft.publishing.username")?.toString()
-                    password = property("unifycraft.publishing.password")?.toString()
+                    username = property("spruceloader.publishing.username")?.toString()
+                    password = property("spruceloader.publishing.password")?.toString()
                 }
             }
 
             maven {
-                name = "UnifyCraftRelease"
-                url = uri("https://maven.unifycraft.xyz/releases")
+                name = "SpruceReleases"
+                url = uri("https://maven.spruceloader.xyz/releases")
                 applyCredentials()
             }
 
             maven {
-                name = "UnifyCraftSnapshots"
-                url = uri("https://maven.unifycraft.xyz/snapshots")
+                name = "SpruceSnapshots"
+                url = uri("https://maven.spruceloader.xyz/snapshots")
                 applyCredentials()
             }
         }
