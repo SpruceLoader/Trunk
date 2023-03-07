@@ -1,120 +1,118 @@
 package xyz.spruceloader.launchwrapper;
 
 import org.apache.commons.io.IOUtils;
-import xyz.spruceloader.launchwrapper.api.LaunchTransformers;
-import xyz.spruceloader.launchwrapper.api.LaunchTransformer;
-import xyz.spruceloader.launchwrapper.exceptions.LoadingException;
+import xyz.spruceloader.launchwrapper.api.*;
 
-import java.net.URL;
-import java.net.URLClassLoader;
+import java.io.*;
+import java.net.*;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.function.Predicate;
 
-/**
- * Adapted from GlassMC Loader under the MIT license
- */
 public class LaunchClassLoader extends URLClassLoader {
-    private final Set<String> classLoaderExceptions = new HashSet<>();
-    private final Set<String> transformationExceptions = new HashSet<>();
 
-    private final Set<String> badClasses = new HashSet<>();
-    private final Map<String, Class<?>> classCache = new HashMap<>();
+    private final List<Predicate<String>> filters = new ArrayList<>();
+    private final ClassLoader fallback;
 
-    public LaunchClassLoader(List<URL> urls, ClassLoader parent) {
-        super(urls.toArray(new URL[0]), parent);
-
-        addClassLoaderException("java.");
-        addClassLoaderException("jdk.");
-        addClassLoaderException("javax.");
-        addClassLoaderException("sun.");
-        addClassLoaderException("com.sun.");
-        addClassLoaderException("org.xml.");
-        addClassLoaderException("org.w3c.");
-        addClassLoaderException("org.apache.");
-        addClassLoaderException("org.slf4j.");
-        addClassLoaderException("com.mojang.blocklist.");
-
-        addClassLoaderException("xyz.spruceloader.launchwrapper.");
+    public LaunchClassLoader(URL[] urls, ClassLoader fallback) {
+        super(urls, null);
+        this.fallback = fallback;
     }
 
-    protected void addPath(Path path) {
+    public void addPath(Path path) {
         try {
-            super.addURL(path.toUri().toURL());
-        } catch (Exception e) {
-            throw new LoadingException("Failed to load an item to the classpath!", e);
+            addURL(path.toUri().toURL());
+        } catch (MalformedURLException e) {
+            throw new IllegalArgumentException(path.toString(), e);
         }
     }
 
+    /**
+     * Adds a loading filter - returns true to filter the class.
+     *
+     * @param filter the filter.
+     */
+    public void addLoadingFilter(Predicate<String> filter) {
+        filters.add(filter);
+    }
+
+    /**
+     * Filters a package out from loading.
+     *
+     * @param packageName the package name.
+     */
+    public void addPackageLoadingFilter(String packageName) {
+        String suffixed = packageName + '.';
+        filters.add(name -> name.startsWith(suffixed));
+    }
+
+    /**
+     * Filters a class out from loading.
+     *
+     * @param className the class name.
+     */
+    public void addClassLoadingFilter(String className) {
+        filters.add(className::equals);
+    }
+
+    private boolean filter(String className) {
+        return filters.stream().anyMatch((filter) -> filter.test(className));
+    }
+
+    @Override
+    public URL getResource(String name) {
+        return super.getResource(name);
+    }
+
+    @Override
     public Class<?> loadClass(String name) throws ClassNotFoundException {
-        if (classLoaderExceptions.stream().anyMatch(name::startsWith))
-            return getParent().loadClass(name);
-        if (classCache.containsKey(name))
-            return classCache.get(name);
+        synchronized (getClassLoadingLock(name)) {
+            Class<?> loaded = findLoadedClass(name);
+            if (loaded != null)
+                return loaded;
 
-        for (String exception : transformationExceptions) {
-            if (name.startsWith(exception)) {
-                try {
-                    Class<?> clz = super.findClass(name);
-                    classCache.put(name, clz);
-                    return clz;
-                } catch (Exception e) {
-                    badClasses.add(name);
-                    throw e;
-                }
-            }
-        }
+            if (filter(name))
+                return fallback.loadClass(name);
 
-        try {
-            Class<?> clz = findLoadedClass(name);
-            if (clz == null) {
-                byte[] data = fetchModifiedClass(name);
-                clz = defineClass(name, data, 0, data.length);
-            }
+            Class<?> result = findClass(name);
+            if (result == null)
+                return fallback.loadClass(name);
 
-            return clz;
-        } catch (Throwable t) {
-            badClasses.add(name);
-            throw new ClassNotFoundException(name, t);
+            return result;
         }
     }
 
-    protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
-        Class<?> clz = loadClass(name);
-        if (resolve) resolveClass(clz);
-        return clz;
-    }
-
-    private byte[] fetchModifiedClass(String name) throws ClassNotFoundException {
-        byte[] data = loadClassData(name);
-        for (LaunchTransformer transformer : LaunchTransformers.getTransformers()) data = transformer.transform(name, data);
-        return data;
-    }
-
-    private byte[] loadClassData(String name) throws ClassNotFoundException {
+    @Override
+    protected Class<?> findClass(String name) throws ClassNotFoundException {
         try {
-            Enumeration<URL> resources = getResources(name.replace('.', '/') + ".class");
+            byte[] data = transformClassBytes(name);
+            if (data == null)
+                throw new ClassNotFoundException(name);
 
-            List<String> locations = new ArrayList<>();
-            List<byte[]> data = new ArrayList<>();
-
-            while (resources.hasMoreElements()) {
-                URL resource = resources.nextElement();
-
-                locations.add(resource.toString());
-                data.add(IOUtils.toByteArray(resource));
-            }
-
-            return data.toArray(new byte[0][])[0];
-        } catch (Exception e) {
+            return defineClass(name, data, 0, data.length);
+        } catch (Throwable e) {
             throw new ClassNotFoundException(name, e);
         }
     }
 
-    public void addClassLoaderException(String className) {
-        classLoaderExceptions.add(className);
+    private byte[] transformClassBytes(String name) throws IOException {
+        return transformClassBytes(name, getClassBytes(name));
     }
 
-    public void addTransformationException(String className) {
-        transformationExceptions.add(className);
+    private byte[] transformClassBytes(String name, byte[] bytes) {
+        for (LaunchTransformer transformer : LaunchTransformers.getTransformers())
+            bytes = transformer.transform(name, bytes);
+
+        return bytes;
     }
+
+    private byte[] getClassBytes(String name) throws IOException {
+        try (InputStream in = getResourceAsStream(name)) {
+            if (in == null)
+                return null;
+
+            return IOUtils.toByteArray(in);
+        }
+    }
+
 }

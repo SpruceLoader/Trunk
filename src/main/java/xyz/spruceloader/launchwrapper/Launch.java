@@ -10,6 +10,7 @@ import java.io.File;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -32,7 +33,7 @@ public class Launch {
             } catch (Throwable t) {
                 return null;
             }
-        }).filter(Objects::nonNull).collect(Collectors.toList()), getClass().getClassLoader());
+        }).filter(Objects::nonNull).collect(Collectors.toList()).toArray(URL[]::new), getClass().getClassLoader());
         Thread.currentThread().setContextClassLoader(classLoader);
         globalProperties.put("launch.development", DEVELOPMENT);
     }
@@ -47,7 +48,11 @@ public class Launch {
             transformer.injectIntoClassLoader(classLoader);
 
             String transformerClassName = transformer.getClass().getName();
-            classLoader.addClassLoaderException(transformerClassName.contains(".") ? transformerClassName.substring(0, transformerClassName.lastIndexOf('.')) : transformerClassName);
+
+            if (transformerClassName.indexOf(".") != 0)
+                classLoader.addPackageLoadingFilter(transformerClassName.substring(0, transformerClassName.lastIndexOf('.')));
+            else
+                classLoader.addClassLoadingFilter(transformerClassName);
         });
 
         launch(argMap.toArray(), env);
@@ -102,7 +107,8 @@ public class Launch {
     }
 
     public void addToClassPath(Path path) {
-        if (classLoader != null) classLoader.addPath(path);
+        if (classLoader != null)
+            classLoader.addPath(path);
         classPath.add(path);
     }
 }
