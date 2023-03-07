@@ -52,7 +52,7 @@ public final class MappingConfiguration {
     }
 
     public String getTargetNamespace() {
-        return Launch.getInstance().isDevelopment() ? "named" : "intermediary";
+        return Launch.DEVELOPMENT ? "named" : "intermediary";
     }
 
     public boolean requiresPackageAccessHack() {

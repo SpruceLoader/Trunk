@@ -17,9 +17,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Launch {
-    private static final boolean DEVELOPMENT = Boolean.getBoolean("launch.development");
+    public static final boolean DEVELOPMENT = Boolean.getBoolean("launch.development");
     private static final Logger LOGGER = LoggerFactory.getLogger("Launchwrapper");
-    private static Launch INSTANCE;
 
     private Map<String, Object> globalProperties = new HashMap<>();
     private LaunchClassLoader classLoader;
@@ -105,15 +104,5 @@ public class Launch {
     public void addToClassPath(Path path) {
         if (classLoader != null) classLoader.addPath(path);
         classPath.add(path);
-    }
-
-    public static boolean isDevelopment() {
-        return DEVELOPMENT;
-    }
-
-    public static Launch getInstance() {
-        if (INSTANCE == null) // Lazy-load the class
-            INSTANCE = new Launch();
-        return INSTANCE;
     }
 }

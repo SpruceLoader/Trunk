@@ -11,6 +11,6 @@ public class MainClient {
         argMap.putIfAbsent("accessToken", "None");
         argMap.putIfAbsent("version", "Unknown");
         argMap.putIfAbsent("gameDir", Paths.get(".").normalize().toString());
-        Launch.getInstance().initialize(argMap, EnvSide.CLIENT);
+        new Launch().initialize(argMap, EnvSide.CLIENT);
     }
 }
