@@ -12,6 +12,7 @@ import java.util.function.Predicate;
 public class LaunchClassLoader extends URLClassLoader {
 
     private final List<Predicate<String>> filters = new ArrayList<>();
+    private final List<Predicate<String>> transformerFilters = new ArrayList<>();
     private final ClassLoader fallback;
 
     public LaunchClassLoader(URL[] urls, ClassLoader fallback) {
@@ -42,8 +43,7 @@ public class LaunchClassLoader extends URLClassLoader {
      * @param packageName the package name.
      */
     public void addPackageLoadingFilter(String packageName) {
-        String suffixed = packageName + '.';
-        filters.add(name -> name.startsWith(suffixed));
+        filters.add(packagePredicate(packageName));
     }
 
     /**
@@ -55,8 +55,31 @@ public class LaunchClassLoader extends URLClassLoader {
         filters.add(className::equals);
     }
 
-    private boolean filter(String className) {
-        return filters.stream().anyMatch((filter) -> filter.test(className));
+    /**
+     * Adds a transformation filter - returns true to filter the class.
+     *
+     * @param filter the filter.
+     */
+    public void addTransformationFilter(Predicate<String> filter) {
+        transformerFilters.add(filter);
+    }
+
+    /**
+     * Filters a package out from being transformed.
+     *
+     * @param packageName the package name.
+     */
+    public void addPackageTransformationFilter(String packageName) {
+        transformerFilters.add(packagePredicate(packageName));
+    }
+
+    /**
+     * Filters a class out from being transformed.
+     *
+     * @param className the class name.
+     */
+    public void addClassTransformationFilter(String className) {
+        transformerFilters.add(className::equals);
     }
 
     @Override
@@ -71,7 +94,7 @@ public class LaunchClassLoader extends URLClassLoader {
             if (loaded != null)
                 return loaded;
 
-            if (filter(name))
+            if (filter(filters, name))
                 return fallback.loadClass(name);
 
             Class<?> result = findClass(name);
@@ -100,6 +123,9 @@ public class LaunchClassLoader extends URLClassLoader {
     }
 
     private byte[] transformClassBytes(String name, byte[] bytes) {
+        if (filter(transformerFilters, name))
+            return bytes;
+
         for (LaunchTransformer transformer : LaunchTransformers.getTransformers())
             bytes = transformer.transform(name, bytes);
 
@@ -113,6 +139,15 @@ public class LaunchClassLoader extends URLClassLoader {
 
             return IOUtils.toByteArray(in);
         }
+    }
+
+    private static boolean filter(List<Predicate<String>> predicates, String className) {
+        return predicates.stream().anyMatch((filter) -> filter.test(className));
+    }
+
+    private static Predicate<String> packagePredicate(String packageName) {
+        String suffixed = packageName + '.';
+        return name -> name.startsWith(suffixed);
     }
 
 }
