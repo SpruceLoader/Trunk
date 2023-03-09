@@ -21,14 +21,16 @@ public class ArgumentMap {
 
     public void putIfAbsent(String key, String value) {
         boolean has = has(key);
-        if (!has) updated = true;
+        if (!has)
+            updated = true;
         internalMap.putIfAbsent(key, new ArrayList<>(Collections.singletonList(value)));
     }
 
     public void put(String key, String value) {
         updated = true;
         List<String> values = getAll(key);
-        if (values == null) values = new ArrayList<>();
+        if (values == null)
+            values = new ArrayList<>();
 
         values.add(value);
         internalMap.put(key, values);
@@ -40,7 +42,8 @@ public class ArgumentMap {
     }
 
     public String[] toArray() {
-        if (!updated && asArray != null) return asArray;
+        if (!updated && asArray != null)
+            return asArray;
         List<String> returnValue = new ArrayList<>();
         internalMap.forEach((key, value) -> value.forEach(item -> {
             returnValue.add("--" + key);
@@ -57,10 +60,12 @@ public class ArgumentMap {
         List<String> input = Arrays.asList(rawInput);
         for (String arg : input) {
             int index = input.indexOf(arg);
-            if (input.size() - 1 < index || !arg.startsWith("--")) continue;
+            if (input.size() - 1 < index || !arg.startsWith("--"))
+                continue;
 
             String value = index + 1 >= input.size() ? "" : input.get(index + 1);
-            if (value.startsWith("--")) value = ""; // This is an empty argument
+            if (value.startsWith("--"))
+                value = ""; // This is an empty argument
 
             String name = arg.substring(2); // Remove the arg name identifier
             returnValue.put(name, value);

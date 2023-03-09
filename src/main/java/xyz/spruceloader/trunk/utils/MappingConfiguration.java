@@ -61,7 +61,8 @@ public final class MappingConfiguration {
     }
 
     private void initialize() {
-        if (initialized) return;
+        if (initialized)
+            return;
 
         URL url = MappingConfiguration.class.getClassLoader().getResource("mappings/mappings.tiny");
 

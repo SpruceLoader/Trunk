@@ -40,12 +40,14 @@ public class LaunchTransformerManager implements Iterable<LaunchTransformer> {
 
     private void handleFromNamespaces(ArgumentMap argMap, String argName, String propName) {
         List<String> argValues = argMap.getAll(argName);
-        if (argValues != null) argValues.forEach(name -> transformers.add(fromName(name)));
+        if (argValues != null)
+            argValues.forEach(name -> transformers.add(fromName(name)));
 
         String prop = System.getProperty(propName);
         if (prop != null) {
             List<String> propValues = Arrays.stream(prop.split("/")).toList();
-            if (!propValues.isEmpty()) propValues.forEach(name -> transformers.add(fromName(name)));
+            if (!propValues.isEmpty())
+                propValues.forEach(name -> transformers.add(fromName(name)));
         }
 
         transformers.removeIf(Objects::isNull);
@@ -55,7 +57,8 @@ public class LaunchTransformerManager implements Iterable<LaunchTransformer> {
     private LaunchTransformer fromName(String name) {
         try {
             Class<?> clz = Class.forName(name, true, LaunchTransformerManager.class.getClassLoader());
-            if (!LaunchTransformer.class.isAssignableFrom(clz)) throw new InvalidClassException("The class provided isn't a launch transformer!");
+            if (!LaunchTransformer.class.isAssignableFrom(clz))
+                throw new InvalidClassException("The class provided isn't a launch transformer!");
             LaunchTransformer instance = (LaunchTransformer) clz.getConstructor().newInstance();
             return instance;
         } catch (InvalidClassException e) {
