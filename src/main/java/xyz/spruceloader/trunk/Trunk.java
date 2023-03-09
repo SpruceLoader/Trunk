@@ -21,10 +21,10 @@ import java.util.stream.Collectors;
 public class Trunk {
     public static final boolean DEVELOPMENT = Boolean.getBoolean("trunk.development");
     private static final Logger LOGGER = LoggerFactory.getLogger("Trunk");
+    public static final Map<String, Object> GLOBAL_PROPERTIES = new HashMap<>();
 
     private final TrunkClassLoader classLoader;
     private final TransformerManager transformerManager;
-    private final Map<String, Object> globalProperties = new HashMap<>();
     private final List<Path> classPath = new ArrayList<>();
 
     public Trunk() {
@@ -38,7 +38,7 @@ public class Trunk {
         }).filter(Objects::nonNull).collect(Collectors.toList()).toArray(URL[]::new), getClass().getClassLoader());
         transformerManager = new TransformerManager();
         Thread.currentThread().setContextClassLoader(classLoader);
-        globalProperties.put("trunk.development", DEVELOPMENT);
+        GLOBAL_PROPERTIES.put("trunk.development", DEVELOPMENT);
     }
 
     public void initialize(ArgumentMap argMap, EnvSide env) {
@@ -100,10 +100,6 @@ public class Trunk {
         } catch (Throwable t) {
             throw new RuntimeException("Failed to launch Minecraft!", t);
         }
-    }
-
-    public Map<String, Object> getGlobalProperties() {
-        return globalProperties;
     }
 
     public TrunkClassLoader getClassLoader() {
