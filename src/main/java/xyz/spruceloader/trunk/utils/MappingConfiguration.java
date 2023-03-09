@@ -1,4 +1,4 @@
-package xyz.spruceloader.launchwrapper.utils;
+package xyz.spruceloader.trunk.utils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,13 +12,13 @@ import java.util.zip.ZipError;
 
 import net.fabricmc.mapping.tree.TinyMappingFactory;
 import net.fabricmc.mapping.tree.TinyTree;
-import xyz.spruceloader.launchwrapper.Launch;
+import xyz.spruceloader.trunk.Trunk;
 
 /**
  * Adapted from Fabric Loader under Apache License 2.0
  */
 public final class MappingConfiguration {
-    private static MappingConfiguration INSTANCE;
+    public static final MappingConfiguration INSTANCE = new MappingConfiguration();
 
     private boolean initialized;
 
@@ -52,7 +52,7 @@ public final class MappingConfiguration {
     }
 
     public String getTargetNamespace() {
-        return Launch.getInstance().isDevelopment() ? "named" : "intermediary";
+        return Trunk.DEVELOPMENT ? "named" : "intermediary";
     }
 
     public boolean requiresPackageAccessHack() {
@@ -61,7 +61,8 @@ public final class MappingConfiguration {
     }
 
     private void initialize() {
-        if (initialized) return;
+        if (initialized)
+            return;
 
         URL url = MappingConfiguration.class.getClassLoader().getResource("mappings/mappings.tiny");
 
@@ -94,11 +95,5 @@ public final class MappingConfiguration {
 
     private static String getManifestValue(Manifest manifest, Name name) {
         return manifest.getMainAttributes().getValue(name);
-    }
-
-    public static MappingConfiguration getInstance() {
-        if (INSTANCE == null)
-            INSTANCE = new MappingConfiguration();
-        return INSTANCE;
     }
 }

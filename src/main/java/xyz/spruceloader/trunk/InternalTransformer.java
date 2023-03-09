@@ -1,27 +1,22 @@
-package xyz.spruceloader.launchwrapper;
+package xyz.spruceloader.trunk;
 
 import org.objectweb.asm.*;
-import xyz.spruceloader.launchwrapper.api.ArgumentMap;
-import xyz.spruceloader.launchwrapper.utils.MappingConfiguration;
-import xyz.spruceloader.launchwrapper.api.EnvSide;
-import xyz.spruceloader.launchwrapper.api.LaunchTransformer;
 
-class InternalLaunchTransformer implements LaunchTransformer {
-    public void takeArguments(ArgumentMap argMap, EnvSide env) {
-        // no-op
-    }
+import xyz.spruceloader.trunk.api.Transformer;
+import xyz.spruceloader.trunk.utils.MappingConfiguration;
 
-    public void injectIntoClassLoader(LaunchClassLoader classLoader) {
-        // no-op
-    }
+class InternalTransformer implements Transformer {
 
     /**
      * Adapted from Fabric Loader under Apache License 2.0
      */
     public byte[] transform(String className, byte[] rawClass) {
-        boolean isMinecraftClass = className.startsWith("net.minecraft.") || className.startsWith("com.mojang.blaze3d.") || className.indexOf('.') < 0;
-        boolean mustTransformAccess = isMinecraftClass && MappingConfiguration.getInstance().requiresPackageAccessHack();
-        if (!mustTransformAccess) return rawClass;
+        boolean isMinecraftClass = className.startsWith("net.minecraft.") || className.startsWith("com.mojang.blaze3d.")
+                || className.indexOf('.') < 0;
+        boolean mustTransformAccess = isMinecraftClass
+                && MappingConfiguration.INSTANCE.requiresPackageAccessHack();
+        if (!mustTransformAccess)
+            return rawClass;
 
         ClassReader classReader = new ClassReader(rawClass);
         ClassWriter classWriter = new ClassWriter(classReader, 0);
@@ -33,7 +28,8 @@ class InternalLaunchTransformer implements LaunchTransformer {
             visitorCount++;
         }
 
-        if (visitorCount <= 0) return rawClass;
+        if (visitorCount <= 0)
+            return rawClass;
         classReader.accept(visitor, 0);
         return classWriter.toByteArray();
     }
@@ -41,9 +37,10 @@ class InternalLaunchTransformer implements LaunchTransformer {
     /**
      * Adapted from Fabric Loader under Apache License 2.0
      *
-     * Changes package-private and protected access flags to public.
-     * In a development environment, Minecraft classes may be mapped into a package structure with invalid access across
-     * packages. The class verifier will complain unless we simply change package-private and protected to public.
+     * Changes package-private and protected access flags to public. In a
+     * development environment, Minecraft classes may be mapped into a package
+     * structure with invalid access across packages. The class verifier will
+     * complain unless we simply change package-private and protected to public.
      */
     private static class PackageAccessFixer extends ClassVisitor {
         private static int modAccess(int access) {
@@ -58,7 +55,8 @@ class InternalLaunchTransformer implements LaunchTransformer {
             super(api, classVisitor);
         }
 
-        public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
+        public void visit(int version, int access, String name, String signature, String superName,
+                String[] interfaces) {
             super.visit(version, modAccess(access), name, signature, superName, interfaces);
         }
 
@@ -70,7 +68,8 @@ class InternalLaunchTransformer implements LaunchTransformer {
             return super.visitField(modAccess(access), name, descriptor, signature, value);
         }
 
-        public MethodVisitor visitMethod(int access, String name, String descriptor, String signature, String[] exceptions) {
+        public MethodVisitor visitMethod(int access, String name, String descriptor, String signature,
+                String[] exceptions) {
             return super.visitMethod(modAccess(access), name, descriptor, signature, exceptions);
         }
     }

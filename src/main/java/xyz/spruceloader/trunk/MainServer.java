@@ -1,7 +1,7 @@
-package xyz.spruceloader.launchwrapper;
+package xyz.spruceloader.trunk;
 
-import xyz.spruceloader.launchwrapper.api.ArgumentMap;
-import xyz.spruceloader.launchwrapper.api.EnvSide;
+import xyz.spruceloader.trunk.api.ArgumentMap;
+import xyz.spruceloader.trunk.api.EnvSide;
 
 public class MainServer {
     public static void main(String[] args) {
@@ -9,6 +9,6 @@ public class MainServer {
         argMap.remove("version");
         argMap.remove("gameDir");
         argMap.remove("assetsDir");
-        Launch.getInstance().initialize(argMap, EnvSide.SERVER);
+        new Trunk().initialize(argMap, EnvSide.SERVER);
     }
 }
