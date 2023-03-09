@@ -85,11 +85,6 @@ public class TrunkClassLoader extends URLClassLoader {
     }
 
     @Override
-    public URL getResource(String name) {
-        return super.getResource(name);
-    }
-
-    @Override
     public Class<?> loadClass(String name) throws ClassNotFoundException {
         synchronized (getClassLoadingLock(name)) {
             Class<?> loaded = findLoadedClass(name);
