@@ -2,10 +2,10 @@ package xyz.spruceloader.trunk;
 
 import org.objectweb.asm.*;
 
-import xyz.spruceloader.trunk.api.LaunchTransformer;
+import xyz.spruceloader.trunk.api.Transformer;
 import xyz.spruceloader.trunk.utils.MappingConfiguration;
 
-class InternalLaunchTransformer implements LaunchTransformer {
+class InternalTransformer implements Transformer {
 
     /**
      * Adapted from Fabric Loader under Apache License 2.0

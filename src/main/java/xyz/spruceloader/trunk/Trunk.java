@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import xyz.spruceloader.trunk.api.ArgumentMap;
 import xyz.spruceloader.trunk.api.EnvSide;
-import xyz.spruceloader.trunk.api.LaunchTransformerManager;
+import xyz.spruceloader.trunk.api.TransformerManager;
 
 import java.io.File;
 import java.lang.invoke.MethodHandle;
@@ -23,7 +23,7 @@ public class Trunk {
     private static final Logger LOGGER = LoggerFactory.getLogger("Trunk");
 
     private final TrunkClassLoader classLoader;
-    private final LaunchTransformerManager transformers;
+    private final TransformerManager transformers;
     private final Map<String, Object> globalProperties = new HashMap<>();
     private final List<Path> classPath = new ArrayList<>();
 
@@ -36,7 +36,7 @@ public class Trunk {
                 return null;
             }
         }).filter(Objects::nonNull).collect(Collectors.toList()).toArray(URL[]::new), getClass().getClassLoader());
-        transformers = new LaunchTransformerManager();
+        transformers = new TransformerManager();
         Thread.currentThread().setContextClassLoader(classLoader);
         globalProperties.put("trunk.development", DEVELOPMENT);
     }
@@ -44,7 +44,7 @@ public class Trunk {
     public void initialize(ArgumentMap argMap, EnvSide env) {
         LOGGER.info("Launching Minecraft with Trunk");
 
-        transformers.addTransformer(new InternalLaunchTransformer());
+        transformers.addTransformer(new InternalTransformer());
         transformers.initialize(argMap);
         transformers.forEach(transformer -> {
             transformer.takeArguments(argMap, env);
@@ -109,7 +109,7 @@ public class Trunk {
         return classLoader;
     }
 
-    public LaunchTransformerManager getTransformers() {
+    public TransformerManager getTransformers() {
         return transformers;
     }
 

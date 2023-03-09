@@ -10,12 +10,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
-public class LaunchTransformerManager implements Iterable<LaunchTransformer> {
+public class TransformerManager implements Iterable<Transformer> {
 
-    private static final Logger LOGGER = LogManager.getLogger("LaunchTransformerManager");
+    private static final Logger LOGGER = LogManager.getLogger("TransformerManager");
 
     private boolean initialized = false;
-    private final List<LaunchTransformer> transformers = new ArrayList<>();
+    private final List<Transformer> transformers = new ArrayList<>();
 
     public void initialize(ArgumentMap argMap) {
         if (initialized)
@@ -25,16 +25,16 @@ public class LaunchTransformerManager implements Iterable<LaunchTransformer> {
         initialized = true;
     }
 
-    public void addTransformer(LaunchTransformer transformer) {
+    public void addTransformer(Transformer transformer) {
         transformers.add(transformer);
     }
 
     @Override
-    public Iterator<LaunchTransformer> iterator() {
+    public Iterator<Transformer> iterator() {
         return transformers.iterator();
     }
 
-    public List<LaunchTransformer> getTransformers() {
+    public List<Transformer> getTransformers() {
         return transformers;
     }
 
@@ -54,12 +54,12 @@ public class LaunchTransformerManager implements Iterable<LaunchTransformer> {
         argMap.remove(argName);
     }
 
-    private LaunchTransformer fromName(String name) {
+    private Transformer fromName(String name) {
         try {
-            Class<?> clz = Class.forName(name, true, LaunchTransformerManager.class.getClassLoader());
-            if (!LaunchTransformer.class.isAssignableFrom(clz))
+            Class<?> clz = Class.forName(name, true, TransformerManager.class.getClassLoader());
+            if (!Transformer.class.isAssignableFrom(clz))
                 throw new InvalidClassException("The class provided isn't a launch transformer!");
-            LaunchTransformer instance = (LaunchTransformer) clz.getConstructor().newInstance();
+            Transformer instance = (Transformer) clz.getConstructor().newInstance();
             return instance;
         } catch (InvalidClassException e) {
             LOGGER.error("There was an invalid launch listener! ({})", name, e);

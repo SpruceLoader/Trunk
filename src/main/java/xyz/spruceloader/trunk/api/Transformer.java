@@ -2,7 +2,7 @@ package xyz.spruceloader.trunk.api;
 
 import xyz.spruceloader.trunk.TrunkClassLoader;
 
-public interface LaunchTransformer {
+public interface Transformer {
 
     default void takeArguments(ArgumentMap argMap, EnvSide env) {
     }
