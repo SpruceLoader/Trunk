@@ -20,8 +20,8 @@ import java.util.stream.Collectors;
 
 public class Trunk {
     public static final boolean DEVELOPMENT = Boolean.getBoolean("trunk.development");
-    private static final Logger LOGGER = LoggerFactory.getLogger("Trunk");
     public static final Map<String, Object> GLOBAL_PROPERTIES = new HashMap<>();
+    private static final Logger LOGGER = LoggerFactory.getLogger("Trunk");
 
     private final TrunkClassLoader classLoader;
     private final TransformerManager transformerManager;
