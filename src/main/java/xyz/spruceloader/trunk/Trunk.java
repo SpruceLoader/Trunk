@@ -1,10 +1,11 @@
-package xyz.spruceloader.launchwrapper;
+package xyz.spruceloader.trunk;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import xyz.spruceloader.launchwrapper.api.ArgumentMap;
-import xyz.spruceloader.launchwrapper.api.LaunchTransformerManager;
-import xyz.spruceloader.launchwrapper.api.EnvSide;
+
+import xyz.spruceloader.trunk.api.ArgumentMap;
+import xyz.spruceloader.trunk.api.EnvSide;
+import xyz.spruceloader.trunk.api.LaunchTransformerManager;
 
 import java.io.File;
 import java.lang.invoke.MethodHandle;
@@ -17,18 +18,18 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class Launch {
-    public static final boolean DEVELOPMENT = Boolean.getBoolean("launch.development");
-    private static final Logger LOGGER = LoggerFactory.getLogger("Launchwrapper");
+public class Trunk {
+    public static final boolean DEVELOPMENT = Boolean.getBoolean("trunk.development");
+    private static final Logger LOGGER = LoggerFactory.getLogger("Trunk");
 
-    private final LaunchClassLoader classLoader;
+    private final TrunkClassLoader classLoader;
     private final LaunchTransformerManager transformers;
     private final Map<String, Object> globalProperties = new HashMap<>();
     private final List<Path> classPath = new ArrayList<>();
 
-    public Launch() {
+    public Trunk() {
         setupClassPath();
-        classLoader = new LaunchClassLoader(this, classPath.stream().map(path -> {
+        classLoader = new TrunkClassLoader(this, classPath.stream().map(path -> {
             try {
                 return path.toUri().toURL();
             } catch (Throwable t) {
@@ -37,11 +38,11 @@ public class Launch {
         }).filter(Objects::nonNull).collect(Collectors.toList()).toArray(URL[]::new), getClass().getClassLoader());
         transformers = new LaunchTransformerManager();
         Thread.currentThread().setContextClassLoader(classLoader);
-        globalProperties.put("launch.development", DEVELOPMENT);
+        globalProperties.put("trunk.development", DEVELOPMENT);
     }
 
     public void initialize(ArgumentMap argMap, EnvSide env) {
-        LOGGER.info("Launching Minecraft with Spruce Launchwrapper");
+        LOGGER.info("Launching Minecraft with Trunk");
 
         transformers.addTransformer(new InternalLaunchTransformer());
         transformers.initialize(argMap);
@@ -82,8 +83,7 @@ public class Launch {
         }
 
         if (!unsupportedEntries.isEmpty())
-            LOGGER.warn(
-                    "UniLoader Launch does not support wildcard class path entries. The game may not load properly.\n{}",
+            LOGGER.warn("Trunk does not support wildcard class path entries. The game may not load properly.\n{}",
                     String.join("\n", unsupportedEntries));
         if (!missingEntries.isEmpty())
             LOGGER.warn("Class-path entries reference missing files! The game may not load properly.\n{}",
@@ -105,7 +105,7 @@ public class Launch {
         return globalProperties;
     }
 
-    public LaunchClassLoader getClassLoader() {
+    public TrunkClassLoader getClassLoader() {
         return classLoader;
     }
 

@@ -1,4 +1,4 @@
-package xyz.spruceloader.launchwrapper.api;
+package xyz.spruceloader.trunk.api;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -21,7 +21,7 @@ public class LaunchTransformerManager implements Iterable<LaunchTransformer> {
         if (initialized)
             throw new IllegalStateException("Cannot initialize launch listeners twice!");
 
-        handleFromNamespaces(argMap, "launchTransformer", "launch.transformers");
+        handleFromNamespaces(argMap, "trunkTransformer", "trunk.transformers");
         initialized = true;
     }
 

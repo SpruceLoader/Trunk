@@ -1,4 +1,4 @@
-package xyz.spruceloader.launchwrapper.utils;
+package xyz.spruceloader.trunk.utils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,7 +12,7 @@ import java.util.zip.ZipError;
 
 import net.fabricmc.mapping.tree.TinyMappingFactory;
 import net.fabricmc.mapping.tree.TinyTree;
-import xyz.spruceloader.launchwrapper.Launch;
+import xyz.spruceloader.trunk.Trunk;
 
 /**
  * Adapted from Fabric Loader under Apache License 2.0
@@ -52,7 +52,7 @@ public final class MappingConfiguration {
     }
 
     public String getTargetNamespace() {
-        return Launch.DEVELOPMENT ? "named" : "intermediary";
+        return Trunk.DEVELOPMENT ? "named" : "intermediary";
     }
 
     public boolean requiresPackageAccessHack() {

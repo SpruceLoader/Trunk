@@ -1,7 +1,8 @@
-package xyz.spruceloader.launchwrapper;
+package xyz.spruceloader.trunk;
 
 import org.apache.commons.io.IOUtils;
-import xyz.spruceloader.launchwrapper.api.*;
+
+import xyz.spruceloader.trunk.api.*;
 
 import java.io.*;
 import java.net.*;
@@ -9,15 +10,15 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Predicate;
 
-public class LaunchClassLoader extends URLClassLoader {
-    private final Launch launch;
+public class TrunkClassLoader extends URLClassLoader {
+    private final Trunk trunk;
     private final List<Predicate<String>> filters = new ArrayList<>();
     private final List<Predicate<String>> transformerFilters = new ArrayList<>();
     private final ClassLoader fallback;
 
-    public LaunchClassLoader(Launch launch, URL[] urls, ClassLoader fallback) {
+    public TrunkClassLoader(Trunk trunk, URL[] urls, ClassLoader fallback) {
         super(urls, null);
-        this.launch = launch;
+        this.trunk = trunk;
         this.fallback = fallback;
     }
 
@@ -127,7 +128,7 @@ public class LaunchClassLoader extends URLClassLoader {
         if (filter(transformerFilters, name))
             return bytes;
 
-        for (LaunchTransformer transformer : launch.getTransformers())
+        for (LaunchTransformer transformer : trunk.getTransformers())
             bytes = transformer.transform(name, bytes);
 
         return bytes;

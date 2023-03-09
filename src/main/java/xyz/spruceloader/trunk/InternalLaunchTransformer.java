@@ -1,10 +1,11 @@
-package xyz.spruceloader.launchwrapper;
+package xyz.spruceloader.trunk;
 
 import org.objectweb.asm.*;
-import xyz.spruceloader.launchwrapper.api.ArgumentMap;
-import xyz.spruceloader.launchwrapper.utils.MappingConfiguration;
-import xyz.spruceloader.launchwrapper.api.EnvSide;
-import xyz.spruceloader.launchwrapper.api.LaunchTransformer;
+
+import xyz.spruceloader.trunk.api.ArgumentMap;
+import xyz.spruceloader.trunk.api.EnvSide;
+import xyz.spruceloader.trunk.api.LaunchTransformer;
+import xyz.spruceloader.trunk.utils.MappingConfiguration;
 
 class InternalLaunchTransformer implements LaunchTransformer {
 

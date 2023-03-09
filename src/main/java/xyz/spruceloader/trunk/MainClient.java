@@ -1,9 +1,9 @@
-package xyz.spruceloader.launchwrapper;
-
-import xyz.spruceloader.launchwrapper.api.ArgumentMap;
-import xyz.spruceloader.launchwrapper.api.EnvSide;
+package xyz.spruceloader.trunk;
 
 import java.nio.file.Paths;
+
+import xyz.spruceloader.trunk.api.ArgumentMap;
+import xyz.spruceloader.trunk.api.EnvSide;
 
 public class MainClient {
     public static void main(String[] args) {
@@ -11,6 +11,6 @@ public class MainClient {
         argMap.putIfAbsent("accessToken", "None");
         argMap.putIfAbsent("version", "Unknown");
         argMap.putIfAbsent("gameDir", Paths.get(".").normalize().toString());
-        new Launch().initialize(argMap, EnvSide.CLIENT);
+        new Trunk().initialize(argMap, EnvSide.CLIENT);
     }
 }
