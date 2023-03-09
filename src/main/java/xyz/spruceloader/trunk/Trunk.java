@@ -47,6 +47,7 @@ public class Trunk {
         transformers.addTransformer(new InternalTransformer());
         transformers.initialize(argMap);
         transformers.forEach(transformer -> {
+            transformer.initialize(this);
             transformer.takeArguments(argMap, env);
             transformer.injectIntoClassLoader(classLoader);
 

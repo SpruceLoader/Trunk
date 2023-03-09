@@ -18,7 +18,7 @@ import xyz.spruceloader.trunk.Trunk;
  * Adapted from Fabric Loader under Apache License 2.0
  */
 public final class MappingConfiguration {
-    private static MappingConfiguration INSTANCE;
+    public static final MappingConfiguration INSTANCE = new MappingConfiguration();
 
     private boolean initialized;
 
@@ -95,11 +95,5 @@ public final class MappingConfiguration {
 
     private static String getManifestValue(Manifest manifest, Name name) {
         return manifest.getMainAttributes().getValue(name);
-    }
-
-    public static MappingConfiguration getInstance() {
-        if (INSTANCE == null)
-            INSTANCE = new MappingConfiguration();
-        return INSTANCE;
     }
 }
