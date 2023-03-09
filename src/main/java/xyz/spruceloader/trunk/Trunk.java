@@ -23,7 +23,7 @@ public class Trunk {
     private static final Logger LOGGER = LoggerFactory.getLogger("Trunk");
 
     private final TrunkClassLoader classLoader;
-    private final TransformerManager transformers;
+    private final TransformerManager transformerManager;
     private final Map<String, Object> globalProperties = new HashMap<>();
     private final List<Path> classPath = new ArrayList<>();
 
@@ -36,17 +36,17 @@ public class Trunk {
                 return null;
             }
         }).filter(Objects::nonNull).collect(Collectors.toList()).toArray(URL[]::new), getClass().getClassLoader());
-        transformers = new TransformerManager();
+        transformerManager = new TransformerManager();
         Thread.currentThread().setContextClassLoader(classLoader);
         globalProperties.put("trunk.development", DEVELOPMENT);
     }
 
     public void initialize(ArgumentMap argMap, EnvSide env) {
-        LOGGER.info("Launching Minecraft with Trunk");
+        LOGGER.info("Launching Minecraft with Spruce Trunk");
 
-        transformers.addTransformer(new InternalTransformer());
-        transformers.initialize(argMap);
-        transformers.forEach(transformer -> {
+        transformerManager.addTransformer(new InternalTransformer());
+        transformerManager.initialize(argMap);
+        transformerManager.forEach(transformer -> {
             transformer.initialize(this);
             transformer.takeArguments(argMap, env);
             transformer.injectIntoClassLoader(classLoader);
@@ -110,8 +110,8 @@ public class Trunk {
         return classLoader;
     }
 
-    public TransformerManager getTransformers() {
-        return transformers;
+    public TransformerManager getTransformerManager() {
+        return transformerManager;
     }
 
     public List<Path> getClassPath() {

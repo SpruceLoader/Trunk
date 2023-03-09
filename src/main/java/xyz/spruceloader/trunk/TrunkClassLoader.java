@@ -123,7 +123,7 @@ public class TrunkClassLoader extends URLClassLoader {
         if (filter(transformerFilters, name))
             return bytes;
 
-        for (Transformer transformer : trunk.getTransformers())
+        for (Transformer transformer : trunk.getTransformerManager())
             bytes = transformer.transform(name, bytes);
 
         return bytes;
