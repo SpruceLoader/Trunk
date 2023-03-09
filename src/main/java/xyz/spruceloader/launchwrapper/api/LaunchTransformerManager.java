@@ -4,19 +4,20 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.InvalidClassException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.Consumer;
 
-public class LaunchTransformers {
-    private static boolean initialized = false;
-    private static final Logger LOGGER = LogManager.getLogger("LaunchTransformers");
+public class LaunchTransformerManager implements Iterable<LaunchTransformer> {
 
-    private static final List<LaunchTransformer> transformers = new CopyOnWriteArrayList<>();
+    private static final Logger LOGGER = LogManager.getLogger("LaunchTransformerManager");
 
-    public static void initialize(ArgumentMap argMap) {
+    private boolean initialized = false;
+    private final List<LaunchTransformer> transformers = new ArrayList<>();
+
+    public void initialize(ArgumentMap argMap) {
         if (initialized)
             throw new IllegalStateException("Cannot initialize launch listeners twice!");
 
@@ -24,19 +25,20 @@ public class LaunchTransformers {
         initialized = true;
     }
 
-    public static void addTransformer(LaunchTransformer transformer) {
+    public void addTransformer(LaunchTransformer transformer) {
         transformers.add(transformer);
     }
 
-    public static void performTask(Consumer<LaunchTransformer> consumer) {
-        transformers.forEach(consumer);
+    @Override
+    public Iterator<LaunchTransformer> iterator() {
+        return transformers.iterator();
     }
 
-    public static List<LaunchTransformer> getTransformers() {
+    public List<LaunchTransformer> getTransformers() {
         return transformers;
     }
 
-    private static void handleFromNamespaces(ArgumentMap argMap, String argName, String propName) {
+    private void handleFromNamespaces(ArgumentMap argMap, String argName, String propName) {
         List<String> argValues = argMap.getAll(argName);
         if (argValues != null) argValues.forEach(name -> transformers.add(fromName(name)));
 
@@ -50,9 +52,9 @@ public class LaunchTransformers {
         argMap.remove(argName);
     }
 
-    private static LaunchTransformer fromName(String name) {
+    private LaunchTransformer fromName(String name) {
         try {
-            Class<?> clz = Class.forName(name, true, LaunchTransformers.class.getClassLoader());
+            Class<?> clz = Class.forName(name, true, LaunchTransformerManager.class.getClassLoader());
             if (!LaunchTransformer.class.isAssignableFrom(clz)) throw new InvalidClassException("The class provided isn't a launch transformer!");
             LaunchTransformer instance = (LaunchTransformer) clz.getConstructor().newInstance();
             return instance;

@@ -10,13 +10,14 @@ import java.util.*;
 import java.util.function.Predicate;
 
 public class LaunchClassLoader extends URLClassLoader {
-
+    private final Launch launch;
     private final List<Predicate<String>> filters = new ArrayList<>();
     private final List<Predicate<String>> transformerFilters = new ArrayList<>();
     private final ClassLoader fallback;
 
-    public LaunchClassLoader(URL[] urls, ClassLoader fallback) {
+    public LaunchClassLoader(Launch launch, URL[] urls, ClassLoader fallback) {
         super(urls, null);
+        this.launch = launch;
         this.fallback = fallback;
     }
 
@@ -126,7 +127,7 @@ public class LaunchClassLoader extends URLClassLoader {
         if (filter(transformerFilters, name))
             return bytes;
 
-        for (LaunchTransformer transformer : LaunchTransformers.getTransformers())
+        for (LaunchTransformer transformer : launch.getTransformers())
             bytes = transformer.transform(name, bytes);
 
         return bytes;
@@ -149,5 +150,4 @@ public class LaunchClassLoader extends URLClassLoader {
         String suffixed = packageName + '.';
         return name -> name.startsWith(suffixed);
     }
-
 }
