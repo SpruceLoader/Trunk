@@ -6,6 +6,12 @@ plugins {
 group = extra["project.group"]?.toString() ?: throw IllegalArgumentException("The project group has not been set.")
 version = extra["project.version"]?.toString() ?: throw IllegalArgumentException("The project version has not been set.")
 
+val gitBranch = System.getenv("GITHUB_REF_NAME")
+val gitCommit = System.getenv("GITHUB_SHA")
+if (gitBranch != null && gitCommit != null) {
+    version = "$version+$gitBranch-$gitCommit"
+}
+
 repositories {
     mavenCentral()
     maven("https://libraries.minecraft.net/")
