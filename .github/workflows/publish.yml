@@ -16,4 +16,7 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Publish with Gradle
-        run: ./gradlew publishAllPublicationsToSpruceSnapshotsRepository -Pspruceloader.publishing.username=${{ secrets.MAVEN_USERNAME }} -Pspruceloader.publishing.password=${{ secrets.MAVEN_USERNAME }} --no-daemon --stacktrace
+        env:
+          - SPRUCELOADER_PUBLISHING_USERNAME: ${{ secrets.MAVEN_USERNAME }}
+          - SPRUCELOADER_PUBLISHING_PASSWORD: ${{ secrets.MAVEN_SECRET }}
+        run: ./gradlew publishAllPublicationsToSpruceSnapshotsRepository --no-daemon --stacktrace

@@ -9,7 +9,8 @@ version = extra["project.version"]?.toString() ?: throw IllegalArgumentException
 val gitBranch = System.getenv("GITHUB_REF_NAME")
 val gitCommit = System.getenv("GITHUB_SHA")
 if (gitBranch != null && gitCommit != null) {
-    version = "$version+$gitBranch-$gitCommit"
+    val shortenedCommit = gitCommit.substring(0, 7)
+    version = "$version+$gitBranch-$shortenedCommit"
 }
 
 repositories {
@@ -44,12 +45,14 @@ publishing {
     }
 
     repositories {
-        if (project.hasProperty("spruceloader.publishing.username") && project.hasProperty("spruceloader.publishing.password")) {
+        val publishingUsername = project.property("spruceloader.publishing.username")?.toString() ?: System.getenv("SPRUCELOADER_PUBLISHING_USERNAME")
+        val publishingPassword = project.property("spruceloader.publishing.password")?.toString() ?: System.getenv("SPRUCELOADER_PUBLISHING_PASSWORD")
+        if (publishingUsername != null && publishingPassword != null) {
             fun MavenArtifactRepository.applyCredentials() {
                 authentication.create<BasicAuthentication>("basic")
                 credentials {
-                    username = property("spruceloader.publishing.username")?.toString()
-                    password = property("spruceloader.publishing.password")?.toString()
+                    username = publishingUsername
+                    password = publishingPassword
                 }
             }
 
