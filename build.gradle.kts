@@ -45,8 +45,8 @@ publishing {
     }
 
     repositories {
-        val publishingUsername = project.property("spruceloader.publishing.username")?.toString() ?: System.getenv("SPRUCELOADER_PUBLISHING_USERNAME")
-        val publishingPassword = project.property("spruceloader.publishing.password")?.toString() ?: System.getenv("SPRUCELOADER_PUBLISHING_PASSWORD")
+        val publishingUsername = project.findProperty("spruceloader.publishing.username")?.toString() ?: System.getenv("SPRUCELOADER_PUBLISHING_USERNAME")
+        val publishingPassword = project.findProperty("spruceloader.publishing.password")?.toString() ?: System.getenv("SPRUCELOADER_PUBLISHING_PASSWORD")
         if (publishingUsername != null && publishingPassword != null) {
             fun MavenArtifactRepository.applyCredentials() {
                 authentication.create<BasicAuthentication>("basic")
