@@ -2,8 +2,6 @@ package xyz.spruceloader.trunk.api;
 
 import java.util.*;
 
-// TODO use Optionals
-// null is evil >:(
 public class ArgumentMap {
     private final Map<String, List<String>> internalMap = new HashMap<>();
     private boolean updated = false; // We will use this to cache things later on
@@ -13,19 +11,31 @@ public class ArgumentMap {
         return internalMap.containsKey(key);
     }
 
-    public String getSingular(String key) {
-        return internalMap.get(key).get(0);
+    public Optional<String> getSingular(String key) {
+        if (has(key)) {
+            List<String> all = getAll(key);
+            if (all.isEmpty())
+                return Optional.empty();
+
+            // should we throw an exception?
+            // this just allows the last to take priority
+            return Optional.of(all.get(all.size() - 1));
+        }
+
+        return Optional.empty();
     }
 
     public List<String> getAll(String key) {
-        return internalMap.get(key);
+        return has(key) ? internalMap.get(key) : Collections.emptyList();
     }
 
     public void putIfAbsent(String key, String value) {
-        boolean has = has(key);
-        if (!has)
+        if (!has(key))
             updated = true;
-        internalMap.putIfAbsent(key, new ArrayList<>(Collections.singletonList(value)));
+
+        List<String> list = new ArrayList<>();
+        list.add(value);
+        internalMap.putIfAbsent(key, list);
     }
 
     public void put(String key, String value) {
