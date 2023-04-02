@@ -11,6 +11,7 @@ import java.io.File;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -29,16 +30,30 @@ public class Trunk {
 
     public Trunk() {
         setupClassPath();
-        classLoader = new TrunkClassLoader(this, classPath.stream().map(path -> {
+        classLoader = new TrunkClassLoader(this, convertObjectsToURLs(classPath.stream().map(path -> {
             try {
                 return path.toUri().toURL();
             } catch (Throwable t) {
                 return null;
             }
-        }).filter(Objects::nonNull).collect(Collectors.toList()).toArray(URL[]::new), getClass().getClassLoader());
+        }).filter(Objects::nonNull).collect(Collectors.toList()).toArray()), getClass().getClassLoader());
+      
         transformerManager = new TransformerManager();
         Thread.currentThread().setContextClassLoader(classLoader);
         GLOBAL_PROPERTIES.put("trunk.development", DEVELOPMENT);
+    }
+    // For Java 8
+    public static URL[] convertObjectsToURLs(Object[] objects) {
+    	URL[] urls = new URL[objects.length];
+    	for (int i = 0; i < objects.length; i++) {
+    		try {
+				urls[i] = new URL(objects[i].toString());
+			} catch (MalformedURLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    	}
+    	return urls;
     }
 
     public void initialize(ArgumentMap argMap, EnvSide env) {

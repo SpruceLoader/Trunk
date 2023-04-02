@@ -15,6 +15,7 @@ public class TrunkClassLoader extends URLClassLoader {
     private final List<Predicate<String>> filters = new ArrayList<>();
     private final List<Predicate<String>> transformerFilters = new ArrayList<>();
     private final ClassLoader fallback;
+    public String[] forbiddenPackages = {"java.", "jdk.", "javax.", "com.sun.","org.apache.logging.log4j.","com.fasterxml.jackson.","sun.", "javax.servlet."};    //denylisted packages, most required by Java, had to look to the LegacyLaunch ClassWrapper to seee that you needed you needed to use parent but then i realised the filter here does that with fallback but does not work, may add more later(like for other JDKs or denylisted files) some like com.sun (as a whole), Jakara, Jackson, and Log4j
 
     public TrunkClassLoader(Trunk trunk, URL[] urls, ClassLoader fallback) {
         super(urls, null);
@@ -102,9 +103,23 @@ public class TrunkClassLoader extends URLClassLoader {
         }
     }
 
+    
+    /**
+     * Filters a class out from being transformed.
+     *
+     * @param className the class name.
+     */
+    public boolean usesForbiddenPackage(String className) {
+    for (String packageName : forbiddenPackages) { 
+if (className.startsWith(packageName)) {return true;}
+    	}
+return false;
+    }
+    
     @Override
     protected Class<?> findClass(String name) throws ClassNotFoundException {
-        try {
+if (usesForbiddenPackage(name)) {return fallback.loadClass(name);}
+    	try {
             byte[] data = transformClassBytes(name);
             if (data == null)
                 throw new ClassNotFoundException(name);
@@ -116,7 +131,8 @@ public class TrunkClassLoader extends URLClassLoader {
     }
 
     private byte[] transformClassBytes(String name) throws IOException {
-        return transformClassBytes(name, getClassBytes(name));
+  // if(getClassBytes(name) != null) {System.out.println("getClassBytes is ok");}else {System.out.println("getClassBytes is nil"+name);} For testing
+    	return transformClassBytes(name, getClassBytes(name));
     }
 
     private byte[] transformClassBytes(String name, byte[] bytes) {
@@ -130,7 +146,7 @@ public class TrunkClassLoader extends URLClassLoader {
     }
 
     private byte[] getClassBytes(String name) throws IOException {
-        try (InputStream in = getResourceAsStream(name)) {
+    	try (InputStream in = getResourceAsStream(name.replace(".", "/").concat(".class"))) { //What you had before did not work and i had to take influence from Javas
             if (in == null)
                 return null;
 
