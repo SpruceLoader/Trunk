@@ -15,7 +15,16 @@ public class TrunkClassLoader extends URLClassLoader {
     private final List<Predicate<String>> filters = new ArrayList<>();
     private final List<Predicate<String>> transformerFilters = new ArrayList<>();
     private final ClassLoader fallback;
-    public String[] forbiddenPackages = {"java.", "jdk.", "javax.", "com.sun.","org.apache.logging.log4j.","com.fasterxml.jackson.","sun.", "javax.servlet."};//Re-evaluate if issues arrise
+
+    {
+        addPackageLoadingFilter("java");
+        addPackageLoadingFilter("jdk");
+        addPackageLoadingFilter("javax");
+        addPackageLoadingFilter("sun");
+        addPackageLoadingFilter("com.sun");
+        addPackageLoadingFilter("org.apache.logging.log4j");
+        addPackageLoadingFilter("org.slf4j");
+    }
 
     public TrunkClassLoader(Trunk trunk, URL[] urls, ClassLoader fallback) {
         super(urls, null);
@@ -102,23 +111,9 @@ public class TrunkClassLoader extends URLClassLoader {
             return result;
         }
     }
-
-    
-    /**
-     * Filters a class out from being transformed.
-     *
-     * @param className the class name.
-     */
-    public boolean usesForbiddenPackage(String className) {
-    for (String packageName : forbiddenPackages) { 
-if (className.startsWith(packageName)) {return true;}
-    	}
-return false;
-    }
     
     @Override
     protected Class<?> findClass(String name) throws ClassNotFoundException {
-if (usesForbiddenPackage(name)) {return fallback.loadClass(name);}
     	try {
             byte[] data = transformClassBytes(name);
             if (data == null)
@@ -131,7 +126,7 @@ if (usesForbiddenPackage(name)) {return fallback.loadClass(name);}
     }
 
     private byte[] transformClassBytes(String name) throws IOException {
-    	return transformClassBytes(name, getClassBytes(name));
+        return transformClassBytes(name, getClassBytes(name));
     }
 
     private byte[] transformClassBytes(String name, byte[] bytes) {
@@ -145,7 +140,7 @@ if (usesForbiddenPackage(name)) {return fallback.loadClass(name);}
     }
 
     private byte[] getClassBytes(String name) throws IOException {
-    	try (InputStream in = getResourceAsStream(name.replace(".", "/").concat(".class"))) {
+        try (InputStream in = getResourceAsStream(name.replace(".", "/").concat(".class"))) {
             if (in == null)
                 return null;
 
