@@ -114,10 +114,10 @@ public class TrunkClassLoader extends URLClassLoader {
             return result;
         }
     }
-    
+
     @Override
     protected Class<?> findClass(String name) throws ClassNotFoundException {
-    	try {
+        try {
             byte[] data = transformClassBytes(name);
             if (data == null)
                 throw new ClassNotFoundException(name);
