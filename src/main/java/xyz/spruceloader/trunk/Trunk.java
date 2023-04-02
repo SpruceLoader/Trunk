@@ -60,7 +60,7 @@ public class Trunk {
                 classLoader.addClassLoadingFilter(transformerClassName);
         });
 
-        launch(argMap.toArray(), env);
+        launch(argMap, env);
     }
 
     private void setupClassPath() {
@@ -91,12 +91,23 @@ public class Trunk {
                     String.join("\n", missingEntries));
     }
 
-    private void launch(String[] args, EnvSide env) {
+    private void launch(ArgumentMap argMap, EnvSide env) {
         try {
-            Class<?> clz = Class.forName(env.getLaunchClass(), false, classLoader);
+            String mainClass = env.getLaunchClass();
+
+            // retrieve override
+            if (argMap.has("trunkMainClass"))
+                mainClass = argMap.getSingular("trunkMainClass");
+            else {
+                String prop = System.getProperty("trunk.mainClass");
+                if (prop != null)
+                    mainClass = prop;
+            }
+
+            Class<?> clz = Class.forName(mainClass, false, classLoader);
             MethodHandle handle = MethodHandles.publicLookup().findStatic(clz, "main",
                     MethodType.methodType(void.class, String[].class));
-            handle.invoke((Object) args);
+            handle.invoke(argMap.toArray());
         } catch (Throwable t) {
             throw new RuntimeException("Failed to launch Minecraft!", t);
         }

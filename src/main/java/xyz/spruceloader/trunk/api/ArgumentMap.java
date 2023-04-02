@@ -2,6 +2,8 @@ package xyz.spruceloader.trunk.api;
 
 import java.util.*;
 
+// TODO use Optionals
+// null is evil >:(
 public class ArgumentMap {
     private final Map<String, List<String>> internalMap = new HashMap<>();
     private boolean updated = false; // We will use this to cache things later on
