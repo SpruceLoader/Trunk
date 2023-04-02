@@ -30,31 +30,18 @@ public class Trunk {
 
     public Trunk() {
         setupClassPath();
-        classLoader = new TrunkClassLoader(this, convertObjectsToURLs(classPath.stream().map(path -> {
+        classLoader = new TrunkClassLoader(this, classPath.stream().map(path -> {
             try {
                 return path.toUri().toURL();
             } catch (Throwable t) {
                 return null;
             }
-        }).filter(Objects::nonNull).collect(Collectors.toList()).toArray()), getClass().getClassLoader());
-      
+        }).filter(Objects::nonNull).collect(Collectors.toList()).toArray(new URL[0]), getClass().getClassLoader());
         transformerManager = new TransformerManager();
         Thread.currentThread().setContextClassLoader(classLoader);
         GLOBAL_PROPERTIES.put("trunk.development", DEVELOPMENT);
     }
-    // For Java 8
-    public static URL[] convertObjectsToURLs(Object[] objects) {
-    	URL[] urls = new URL[objects.length];
-    	for (int i = 0; i < objects.length; i++) {
-    		try {
-				urls[i] = new URL(objects[i].toString());
-			} catch (MalformedURLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-    	}
-    	return urls;
-    }
+  
 
     public void initialize(ArgumentMap argMap, EnvSide env) {
         LOGGER.info("Launching Minecraft with Spruce Trunk");
