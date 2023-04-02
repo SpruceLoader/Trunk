@@ -31,6 +31,19 @@ public class TrunkClassLoader extends URLClassLoader {
     }
 
     /**
+     * Adds the default loading filters. This is subject to change!
+     */
+    public void addDefaultLoadingFilters() {
+        addPackageLoadingFilter("java");
+        addPackageLoadingFilter("jdk");
+        addPackageLoadingFilter("javax");
+        addPackageLoadingFilter("sun");
+        addPackageLoadingFilter("com.sun");
+        addPackageLoadingFilter("org.apache.logging.log4j");
+        addPackageLoadingFilter("org.slf4j");
+    }
+
+    /**
      * Adds a loading filter - returns true to filter the class.
      *
      * @param filter the filter.
@@ -130,7 +143,7 @@ public class TrunkClassLoader extends URLClassLoader {
     }
 
     private byte[] getClassBytes(String name) throws IOException {
-        try (InputStream in = getResourceAsStream(name)) {
+        try (InputStream in = getResourceAsStream(name.replace(".", "/").concat(".class"))) {
             if (in == null)
                 return null;
 

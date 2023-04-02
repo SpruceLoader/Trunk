@@ -11,6 +11,7 @@ import java.io.File;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -35,11 +36,12 @@ public class Trunk {
             } catch (Throwable t) {
                 return null;
             }
-        }).filter(Objects::nonNull).collect(Collectors.toList()).toArray(URL[]::new), getClass().getClassLoader());
+        }).filter(Objects::nonNull).collect(Collectors.toList()).toArray(new URL[0]), getClass().getClassLoader());
         transformerManager = new TransformerManager();
         Thread.currentThread().setContextClassLoader(classLoader);
         GLOBAL_PROPERTIES.put("trunk.development", DEVELOPMENT);
     }
+  
 
     public void initialize(ArgumentMap argMap, EnvSide env) {
         LOGGER.info("Launching Minecraft with Spruce Trunk");

@@ -9,6 +9,9 @@ public class MainServer {
         argMap.remove("version");
         argMap.remove("gameDir");
         argMap.remove("assetsDir");
-        new Trunk().initialize(argMap, EnvSide.SERVER);
+
+        Trunk trunk = new Trunk();
+        trunk.initialize(argMap, EnvSide.SERVER);
+        trunk.getClassLoader().addDefaultLoadingFilters();
     }
 }

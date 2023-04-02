@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class TransformerManager implements Iterable<Transformer> {
 
@@ -44,8 +45,9 @@ public class TransformerManager implements Iterable<Transformer> {
             argValues.forEach(name -> transformers.add(fromName(name)));
 
         String prop = System.getProperty(propName);
+
         if (prop != null) {
-            List<String> propValues = Arrays.stream(prop.split("/")).toList();
+            List<String> propValues = Arrays.stream(prop.split("/")).collect(Collectors.toList());
             if (!propValues.isEmpty())
                 propValues.forEach(name -> transformers.add(fromName(name)));
         }
