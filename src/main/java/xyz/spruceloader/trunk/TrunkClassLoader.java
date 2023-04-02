@@ -16,16 +16,6 @@ public class TrunkClassLoader extends URLClassLoader {
     private final List<Predicate<String>> transformerFilters = new ArrayList<>();
     private final ClassLoader fallback;
 
-    {
-        addPackageLoadingFilter("java");
-        addPackageLoadingFilter("jdk");
-        addPackageLoadingFilter("javax");
-        addPackageLoadingFilter("sun");
-        addPackageLoadingFilter("com.sun");
-        addPackageLoadingFilter("org.apache.logging.log4j");
-        addPackageLoadingFilter("org.slf4j");
-    }
-
     public TrunkClassLoader(Trunk trunk, URL[] urls, ClassLoader fallback) {
         super(urls, null);
         this.trunk = trunk;
@@ -38,6 +28,19 @@ public class TrunkClassLoader extends URLClassLoader {
         } catch (MalformedURLException e) {
             throw new IllegalArgumentException(path.toString(), e);
         }
+    }
+
+    /**
+     * Adds the default loading filters. This is subject to change!
+     */
+    public void addDefaultLoadingFilters() {
+        addPackageLoadingFilter("java");
+        addPackageLoadingFilter("jdk");
+        addPackageLoadingFilter("javax");
+        addPackageLoadingFilter("sun");
+        addPackageLoadingFilter("com.sun");
+        addPackageLoadingFilter("org.apache.logging.log4j");
+        addPackageLoadingFilter("org.slf4j");
     }
 
     /**
