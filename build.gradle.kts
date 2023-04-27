@@ -1,6 +1,7 @@
 plugins {
     java
     `maven-publish`
+    id("org.quiltmc.gradle.licenser") version "2.0.1"
 }
 
 group = extra["project.group"]?.toString()
@@ -37,6 +38,10 @@ java {
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(8))
     }
+}
+
+license {
+    rule(file("codeformat/FILEHEADER"))
 }
 
 publishing {
