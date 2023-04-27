@@ -15,7 +15,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.stream.Collectors;
+
+import static xyz.spruceloader.trunk.utils.FunctionalExceptionHandlers.unexcept;
 
 public class Trunk {
     public static final boolean DEVELOPMENT = Boolean.getBoolean("trunk.development");
@@ -28,13 +29,13 @@ public class Trunk {
 
     public Trunk() {
         setupClassPath();
-        classLoader = new TrunkClassLoader(this, classPath.stream().map(path -> {
-            try {
-                return path.toUri().toURL();
-            } catch (Throwable t) {
-                return null;
-            }
-        }).filter(Objects::nonNull).collect(Collectors.toList()).toArray(URL[]::new), getClass().getClassLoader());
+        classLoader = new TrunkClassLoader(
+                this,
+                classPath.stream()
+                        .map(unexcept(path -> path.toUri().toURL()))
+                        .toArray(URL[]::new),
+                getClass().getClassLoader()
+        );
         transformerManager = new TransformerManager();
         Thread.currentThread().setContextClassLoader(classLoader);
         GLOBAL_PROPERTIES.put("trunk.development", DEVELOPMENT);
