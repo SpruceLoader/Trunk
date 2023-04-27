@@ -19,11 +19,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.InvalidClassException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class TransformerManager implements Iterable<Transformer> {
 
@@ -60,9 +56,8 @@ public class TransformerManager implements Iterable<Transformer> {
 
         String prop = System.getProperty(propName);
         if (prop != null) {
-            List<String> propValues = Arrays.asList(prop.split("/"));
-            if (!propValues.isEmpty())
-                propValues.forEach(name -> transformers.add(fromName(name)));
+            Arrays.stream(prop.split("/"))
+                    .forEach(name -> transformers.add(fromName(name)));
         }
 
         transformers.removeIf(Objects::isNull);
