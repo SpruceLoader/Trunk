@@ -11,7 +11,8 @@ class InternalTransformer implements Transformer {
      * Adapted from Fabric Loader under Apache License 2.0
      */
     public byte[] transform(String className, byte[] rawClass) {
-        boolean isMinecraftClass = className.startsWith("net.minecraft.") || className.startsWith("com.mojang.blaze3d.")
+        boolean isMinecraftClass = className.startsWith("net.minecraft.")
+                || className.startsWith("com.mojang.blaze3d.")
                 || className.indexOf('.') < 0;
         boolean mustTransformAccess = isMinecraftClass
                 && MappingConfiguration.INSTANCE.requiresPackageAccessHack();
@@ -21,22 +22,15 @@ class InternalTransformer implements Transformer {
         ClassReader classReader = new ClassReader(rawClass);
         ClassWriter classWriter = new ClassWriter(classReader, 0);
         ClassVisitor visitor = classWriter;
-        int visitorCount = 0;
 
-        if (mustTransformAccess) {
-            visitor = new PackageAccessFixer(Opcodes.ASM9, visitor);
-            visitorCount++;
-        }
-
-        if (visitorCount <= 0)
-            return rawClass;
+        visitor = new PackageAccessFixer(Opcodes.ASM9, visitor);
         classReader.accept(visitor, 0);
         return classWriter.toByteArray();
     }
 
     /**
      * Adapted from Fabric Loader under Apache License 2.0
-     *
+     * <p>
      * Changes package-private and protected access flags to public. In a
      * development environment, Minecraft classes may be mapped into a package
      * structure with invalid access across packages. The class verifier will
@@ -56,7 +50,7 @@ class InternalTransformer implements Transformer {
         }
 
         public void visit(int version, int access, String name, String signature, String superName,
-                String[] interfaces) {
+                          String[] interfaces) {
             super.visit(version, modAccess(access), name, signature, superName, interfaces);
         }
 
@@ -69,7 +63,7 @@ class InternalTransformer implements Transformer {
         }
 
         public MethodVisitor visitMethod(int access, String name, String descriptor, String signature,
-                String[] exceptions) {
+                                         String[] exceptions) {
             return super.visitMethod(modAccess(access), name, descriptor, signature, exceptions);
         }
     }

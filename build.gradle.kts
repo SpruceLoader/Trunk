@@ -3,11 +3,13 @@ plugins {
     `maven-publish`
 }
 
-group = extra["project.group"]?.toString() ?: throw IllegalArgumentException("The project group has not been set.")
-version = extra["project.version"]?.toString() ?: throw IllegalArgumentException("The project version has not been set.")
+group = extra["project.group"]?.toString()
+    ?: throw IllegalArgumentException("The project group has not been set.")
+version = extra["project.version"]?.toString()
+    ?: throw IllegalArgumentException("The project version has not been set.")
 
-val gitBranch = System.getenv("GITHUB_REF_NAME")
-val gitCommit = System.getenv("GITHUB_SHA")
+val gitBranch: String? = System.getenv("GITHUB_REF_NAME")
+val gitCommit: String? = System.getenv("GITHUB_SHA")
 if (gitBranch != null && gitCommit != null) {
     val shortenedCommit = gitCommit.substring(0, 7)
     version = "$version-SNAPSHOT+$gitBranch-$shortenedCommit"
@@ -35,9 +37,8 @@ java {
 
 publishing {
     publications.create<MavenPublication>("mavenJava") {
-        artifactId =
-            extra["project.name"]?.toString()
-                ?: throw IllegalArgumentException("The project name has not been set.")
+        artifactId = extra["project.name"]?.toString()
+            ?: throw IllegalArgumentException("The project name has not been set.")
         groupId = project.group.toString()
         version = project.version.toString()
 
@@ -45,8 +46,10 @@ publishing {
     }
 
     repositories {
-        val publishingUsername = project.findProperty("spruceloader.publishing.username")?.toString() ?: System.getenv("SPRUCELOADER_PUBLISHING_USERNAME")
-        val publishingPassword = project.findProperty("spruceloader.publishing.password")?.toString() ?: System.getenv("SPRUCELOADER_PUBLISHING_PASSWORD")
+        val publishingUsername = project.findProperty("spruceloader.publishing.username")?.toString()
+            ?: System.getenv("SPRUCELOADER_PUBLISHING_USERNAME")
+        val publishingPassword = project.findProperty("spruceloader.publishing.password")?.toString()
+            ?: System.getenv("SPRUCELOADER_PUBLISHING_PASSWORD")
         if (publishingUsername != null && publishingPassword != null) {
             fun MavenArtifactRepository.applyCredentials() {
                 authentication.create<BasicAuthentication>("basic")

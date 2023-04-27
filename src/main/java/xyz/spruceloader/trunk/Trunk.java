@@ -2,7 +2,6 @@ package xyz.spruceloader.trunk;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import xyz.spruceloader.trunk.api.ArgumentMap;
 import xyz.spruceloader.trunk.api.EnvSide;
 import xyz.spruceloader.trunk.api.TransformerManager;
@@ -107,7 +106,7 @@ public class Trunk {
             Class<?> clz = Class.forName(mainClass, false, classLoader);
             MethodHandle handle = MethodHandles.publicLookup().findStatic(clz, "main",
                     MethodType.methodType(void.class, String[].class));
-            handle.invoke(argMap.toArray());
+            handle.invoke((Object) argMap.toArray());
         } catch (Throwable t) {
             throw new RuntimeException("Failed to launch Minecraft!", t);
         }
