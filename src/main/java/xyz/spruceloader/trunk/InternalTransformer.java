@@ -29,8 +29,8 @@ class InternalTransformer implements Transformer {
         boolean isMinecraftClass = className.startsWith("net.minecraft.")
                 || className.startsWith("com.mojang.blaze3d.")
                 || className.indexOf('.') < 0;
-        boolean mustTransformAccess = isMinecraftClass
-                && MappingConfiguration.INSTANCE.requiresPackageAccessHack();
+        boolean mustTransformAccess = isMinecraftClass &&
+                MappingConfiguration.getOrCreate().requiresPackageAccessHack();
         if (!mustTransformAccess)
             return rawClass;
 

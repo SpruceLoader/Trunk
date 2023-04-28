@@ -15,6 +15,10 @@
 
 package xyz.spruceloader.trunk.utils;
 
+import net.fabricmc.mapping.tree.TinyMappingFactory;
+import net.fabricmc.mapping.tree.TinyTree;
+import xyz.spruceloader.trunk.Trunk;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -25,44 +29,34 @@ import java.util.jar.Attributes.Name;
 import java.util.jar.Manifest;
 import java.util.zip.ZipError;
 
-import net.fabricmc.mapping.tree.TinyMappingFactory;
-import net.fabricmc.mapping.tree.TinyTree;
-import xyz.spruceloader.trunk.Trunk;
-
 /**
  * Adapted from Fabric Loader under Apache License 2.0
  */
 public final class MappingConfiguration {
-    public static final MappingConfiguration INSTANCE = new MappingConfiguration();
-
-    private boolean initialized;
+    private static MappingConfiguration INSTANCE;
 
     private String gameId;
     private String gameVersion;
     private TinyTree mappings;
 
-    public String getGameId() {
+    private MappingConfiguration() {
         initialize();
+    }
 
+    public String getGameId() {
         return gameId;
     }
 
     public String getGameVersion() {
-        initialize();
-
         return gameVersion;
     }
 
     public boolean matches(String gameId, String gameVersion) {
-        initialize();
-
         return (this.gameId == null || gameId == null || gameId.equals(this.gameId))
                 && (this.gameVersion == null || gameVersion == null || gameVersion.equals(this.gameVersion));
     }
 
     public TinyTree getMappings() {
-        initialize();
-
         return mappings;
     }
 
@@ -76,9 +70,6 @@ public final class MappingConfiguration {
     }
 
     private void initialize() {
-        if (initialized)
-            return;
-
         URL url = MappingConfiguration.class.getClassLoader().getResource("mappings/mappings.tiny");
 
         if (url != null) {
@@ -104,11 +95,16 @@ public final class MappingConfiguration {
 
         if (mappings == null)
             mappings = TinyMappingFactory.EMPTY_TREE;
-
-        initialized = true;
     }
 
     private static String getManifestValue(Manifest manifest, Name name) {
         return manifest.getMainAttributes().getValue(name);
+    }
+
+    public static MappingConfiguration getOrCreate() {
+        if (INSTANCE == null) {
+            INSTANCE = new MappingConfiguration();
+        }
+        return INSTANCE;
     }
 }
