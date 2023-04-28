@@ -92,7 +92,7 @@ public class ArgumentMap {
         return returnValue;
     }
 
-    public void markDirty() {
+    private void markDirty() {
         updated = true;
     }
 }
