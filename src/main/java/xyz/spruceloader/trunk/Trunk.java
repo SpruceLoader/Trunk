@@ -34,9 +34,12 @@ import java.util.*;
 import static xyz.spruceloader.trunk.utils.FunctionalExceptionHandlers.unexcept;
 
 public class Trunk {
-    public static final boolean DEVELOPMENT = Boolean.getBoolean("trunk.development");
-    public static final Map<String, Object> GLOBAL_PROPERTIES = new HashMap<>();
-    private static final Logger LOGGER = LoggerFactory.getLogger("Trunk");
+    public static final boolean DEVELOPMENT =
+            Boolean.getBoolean("trunk.development");
+    public static final Map<String, Object> GLOBAL_PROPERTIES =
+            new HashMap<>();
+    private static final Logger LOGGER =
+            LoggerFactory.getLogger(Trunk.class);
 
     private final TrunkClassLoader classLoader;
     private final TransformerManager transformerManager;
@@ -70,7 +73,10 @@ public class Trunk {
 
             if (transformerClassName.indexOf(".") != 0)
                 classLoader.addPackageLoadingFilter(
-                        transformerClassName.substring(0, transformerClassName.lastIndexOf('.')));
+                        transformerClassName.substring(
+                                0, transformerClassName.lastIndexOf('.')
+                        )
+                );
             else
                 classLoader.addClassLoadingFilter(transformerClassName);
         });
@@ -83,7 +89,9 @@ public class Trunk {
         List<String> unsupportedEntries = new ArrayList<>();
         List<String> missingEntries = new ArrayList<>();
 
-        for (String entry : System.getProperty("java.class.path").split(File.pathSeparator)) {
+        String[] classPathEntries = System.getProperty("java.class.path")
+                .split(File.pathSeparator);
+        for (String entry : classPathEntries) {
             if (entry.equals("*") || entry.endsWith(File.pathSeparator + "*")) {
                 unsupportedEntries.add(entry);
                 continue;

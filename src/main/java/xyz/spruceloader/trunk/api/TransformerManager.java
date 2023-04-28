@@ -30,7 +30,8 @@ public class TransformerManager implements Iterable<Transformer> {
 
     public void initialize(ArgumentMap argMap) {
         if (initialized)
-            throw new IllegalStateException("Cannot initialize launch listeners twice!");
+            throw new IllegalStateException("Cannot initialize launch" +
+                    " listeners twice!");
 
         handleFromNamespaces(argMap, "trunkTransformer", "trunk.transformers");
         initialized = true;
@@ -64,10 +65,12 @@ public class TransformerManager implements Iterable<Transformer> {
     }
 
     private Transformer fromName(String name) {
+        ClassLoader loader = TransformerManager.class.getClassLoader();
         try {
-            Class<?> clz = Class.forName(name, true, TransformerManager.class.getClassLoader());
+            Class<?> clz = Class.forName(name, true, loader);
             if (!Transformer.class.isAssignableFrom(clz))
-                throw new InvalidClassException("The class provided isn't a launch transformer!");
+                throw new InvalidClassException("The class provided isn't a" +
+                        " launch transformer!");
             return (Transformer) clz.getConstructor().newInstance();
         } catch (InvalidClassException e) {
             LOGGER.error("There was an invalid launch listener! ({})", name, e);
