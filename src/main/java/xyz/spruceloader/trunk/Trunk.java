@@ -108,15 +108,10 @@ public class Trunk {
 
     private void launch(ArgumentMap argMap, EnvSide env) {
         try {
-            String mainClass = env.getLaunchClass();
-
-            // retrieve override
-            if (argMap.has("trunkMainClass"))
-                mainClass = argMap.getSingular("trunkMainClass");
-            else {
-                String prop = System.getProperty("trunk.mainClass");
-                if (prop != null)
-                    mainClass = prop;
+            String mainClass = argMap.get("trunkMainClass").orElseGet(env::getLaunchClass);
+            Optional<String> fromProperty = Optional.ofNullable(System.getProperty("trunk.mainClass"));
+            if (fromProperty.isPresent()) {
+                mainClass = fromProperty.get();
             }
 
             Class<?> clz = Class.forName(mainClass, false, classLoader);

@@ -50,9 +50,8 @@ public class TransformerManager implements Iterable<Transformer> {
     }
 
     private void handleFromNamespaces(ArgumentMap argMap, String argName, String propName) {
-        List<String> argValues = argMap.getAll(argName);
-        if (argValues != null)
-            argValues.forEach(name -> transformers.add(fromName(name)));
+        argMap.getAll(argName).ifPresent(values ->
+                values.forEach(name -> transformers.add(fromName(name))));
 
         String prop = System.getProperty(propName);
         if (prop != null) {

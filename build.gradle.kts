@@ -27,6 +27,8 @@ dependencies {
     implementation("org.ow2.asm:asm-tree:9.4")
     implementation("net.fabricmc:tiny-mappings-parser:0.3.0+build.17")
 
+    implementation("org.jetbrains:annotations:24.0.1")
+
     compileOnly("org.apache.logging.log4j:log4j-api:2.8.1")
     compileOnly("org.slf4j:slf4j-api:1.8.0-beta4")
 }

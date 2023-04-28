@@ -15,10 +15,10 @@
 
 package xyz.spruceloader.trunk.api;
 
+import org.jetbrains.annotations.Unmodifiable;
+
 import java.util.*;
 
-// TODO use Optionals
-// null is evil >:(
 public class ArgumentMap {
     private final Map<String, List<String>> internalMap = new HashMap<>();
     private boolean updated = false; // We will use this to cache things later on
@@ -28,33 +28,31 @@ public class ArgumentMap {
         return internalMap.containsKey(key);
     }
 
-    public String getSingular(String key) {
-        return internalMap.get(key).get(0);
+    public Optional<String> get(String key) {
+        return getAll(key).map(list -> list.get(0));
     }
 
-    public List<String> getAll(String key) {
-        return internalMap.get(key);
+    public Optional<@Unmodifiable List<String>> getAll(String key) {
+        return Optional.ofNullable(internalMap.get(key));
     }
 
     public void putIfAbsent(String key, String value) {
         boolean has = has(key);
-        if (!has)
-            updated = true;
+        if (!has) markDirty();
         internalMap.putIfAbsent(key, new ArrayList<>(Collections.singletonList(value)));
     }
 
     public void put(String key, String value) {
-        updated = true;
-        List<String> values = getAll(key);
-        if (values == null)
-            values = new ArrayList<>();
+        markDirty();
 
+        Optional<List<String>> valuesOpt = getAll(key);
+        List<String> values = valuesOpt.orElseGet(ArrayList::new);
         values.add(value);
         internalMap.put(key, values);
     }
 
     public void remove(String key) {
-        updated = true;
+        markDirty();
         internalMap.remove(key);
     }
 
@@ -88,5 +86,9 @@ public class ArgumentMap {
             returnValue.put(name, value);
         }
         return returnValue;
+    }
+
+    public void markDirty() {
+        updated = true;
     }
 }
