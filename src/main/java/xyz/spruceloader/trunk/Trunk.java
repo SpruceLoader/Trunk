@@ -125,7 +125,8 @@ public class Trunk {
             Class<?> clz = Class.forName(mainClass, false, classLoader);
             MethodHandle handle = MethodHandles.publicLookup().findStatic(clz, "main",
                     MethodType.methodType(void.class, String[].class));
-            handle.invoke((Object) argMap.toArray());
+            //noinspection ConfusingArgumentToVarargsMethod
+            handle.invoke(argMap.toArray());
         } catch (Throwable t) {
             throw new RuntimeException("Failed to launch Minecraft!", t);
         }
