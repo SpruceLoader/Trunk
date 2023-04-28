@@ -15,15 +15,15 @@
 
 package xyz.spruceloader.trunk.api;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.InvalidClassException;
 import java.util.*;
 
 public class TransformerManager implements Iterable<Transformer> {
-
-    private static final Logger LOGGER = LogManager.getLogger("TransformerManager");
+    private static final Logger LOGGER =
+            LoggerFactory.getLogger(TransformerManager.class);
 
     private final List<Transformer> transformers = new ArrayList<>();
     private boolean initialized = false;
