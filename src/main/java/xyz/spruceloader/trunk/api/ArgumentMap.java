@@ -15,8 +15,6 @@
 
 package xyz.spruceloader.trunk.api;
 
-import org.jetbrains.annotations.Unmodifiable;
-
 import java.util.*;
 
 public class ArgumentMap {
@@ -29,11 +27,15 @@ public class ArgumentMap {
     }
 
     public Optional<String> get(String key) {
-        return getAll(key).map(list -> list.get(0));
+        List<String> values = getAll(key);
+        if (values.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.ofNullable(values.get(values.size() - 1));
     }
 
-    public Optional<@Unmodifiable List<String>> getAll(String key) {
-        return Optional.ofNullable(internalMap.get(key));
+    public List<String> getAll(String key) {
+        return internalMap.get(key);
     }
 
     public void putIfAbsent(String key, String value) {
@@ -45,8 +47,10 @@ public class ArgumentMap {
     public void put(String key, String value) {
         markDirty();
 
-        Optional<List<String>> valuesOpt = getAll(key);
-        List<String> values = valuesOpt.orElseGet(ArrayList::new);
+        List<String> values = getAll(key);
+        if (values == null) {
+            values = new ArrayList<>();
+        }
         values.add(value);
         internalMap.put(key, values);
     }
