@@ -33,7 +33,7 @@ import java.util.zip.ZipError;
  * Adapted from Fabric Loader under Apache License 2.0
  */
 public final class MappingConfiguration {
-    private static MappingConfiguration INSTANCE;
+    private static MappingConfiguration instance;
 
     private String gameId;
     private String gameVersion;
@@ -102,9 +102,9 @@ public final class MappingConfiguration {
     }
 
     public static MappingConfiguration getOrCreate() {
-        if (INSTANCE == null) {
-            INSTANCE = new MappingConfiguration();
+        if (instance == null) {
+            instance = new MappingConfiguration();
         }
-        return INSTANCE;
+        return instance;
     }
 }
