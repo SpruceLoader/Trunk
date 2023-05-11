@@ -1,9 +1,22 @@
+/*
+ * Trunk, the Spruce service used to launch Minecraft
+ * Copyright (C) 2023  SpruceLoader
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
 package xyz.spruceloader.trunk.api;
 
 import java.util.*;
 
-// TODO use Optionals
-// null is evil >:(
 public class ArgumentMap {
     private final Map<String, List<String>> internalMap = new HashMap<>();
     private boolean updated = false; // We will use this to cache things later on
@@ -13,8 +26,12 @@ public class ArgumentMap {
         return internalMap.containsKey(key);
     }
 
-    public String getSingular(String key) {
-        return internalMap.get(key).get(0);
+    public Optional<String> get(String key) {
+        List<String> values = getAll(key);
+        if (values.isEmpty())
+            return Optional.empty();
+
+        return Optional.ofNullable(values.get(values.size() - 1));
     }
 
     public List<String> getAll(String key) {
@@ -24,12 +41,14 @@ public class ArgumentMap {
     public void putIfAbsent(String key, String value) {
         boolean has = has(key);
         if (!has)
-            updated = true;
+            markDirty();
+
         internalMap.putIfAbsent(key, new ArrayList<>(Collections.singletonList(value)));
     }
 
     public void put(String key, String value) {
-        updated = true;
+        markDirty();
+
         List<String> values = getAll(key);
         if (values == null)
             values = new ArrayList<>();
@@ -39,13 +58,14 @@ public class ArgumentMap {
     }
 
     public void remove(String key) {
-        updated = true;
+        markDirty();
         internalMap.remove(key);
     }
 
     public String[] toArray() {
         if (!updated && asArray != null)
             return asArray;
+
         List<String> returnValue = new ArrayList<>();
         internalMap.forEach((key, value) -> value.forEach(item -> {
             returnValue.add("--" + key);
@@ -73,5 +93,9 @@ public class ArgumentMap {
             returnValue.put(name, value);
         }
         return returnValue;
+    }
+
+    private void markDirty() {
+        updated = true;
     }
 }

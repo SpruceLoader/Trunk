@@ -1,8 +1,22 @@
+/*
+ * Trunk, the Spruce service used to launch Minecraft
+ * Copyright (C) 2023  SpruceLoader
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
 package xyz.spruceloader.trunk;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import xyz.spruceloader.trunk.api.ArgumentMap;
 import xyz.spruceloader.trunk.api.EnvSide;
 import xyz.spruceloader.trunk.api.TransformerManager;
@@ -16,12 +30,16 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.stream.Collectors;
+
+import static xyz.spruceloader.trunk.utils.FunctionalExceptionHandlers.unexcept;
 
 public class Trunk {
-    public static final boolean DEVELOPMENT = Boolean.getBoolean("trunk.development");
-    public static final Map<String, Object> GLOBAL_PROPERTIES = new HashMap<>();
-    private static final Logger LOGGER = LoggerFactory.getLogger("Trunk");
+    public static final boolean DEVELOPMENT =
+            Boolean.getBoolean("trunk.development");
+    public static final Map<String, Object> GLOBAL_PROPERTIES =
+            new HashMap<>();
+    private static final Logger LOGGER =
+            LoggerFactory.getLogger(Trunk.class);
 
     private final TrunkClassLoader classLoader;
     private final TransformerManager transformerManager;
@@ -29,13 +47,13 @@ public class Trunk {
 
     public Trunk() {
         setupClassPath();
-        classLoader = new TrunkClassLoader(this, classPath.stream().map(path -> {
-            try {
-                return path.toUri().toURL();
-            } catch (Throwable t) {
-                return null;
-            }
-        }).filter(Objects::nonNull).collect(Collectors.toList()).toArray(URL[]::new), getClass().getClassLoader());
+        classLoader = new TrunkClassLoader(
+                this,
+                classPath.stream()
+                        .map(unexcept(path -> path.toUri().toURL()))
+                        .toArray(URL[]::new),
+                getClass().getClassLoader()
+        );
         transformerManager = new TransformerManager();
         Thread.currentThread().setContextClassLoader(classLoader);
         GLOBAL_PROPERTIES.put("trunk.development", DEVELOPMENT);
@@ -55,7 +73,10 @@ public class Trunk {
 
             if (transformerClassName.indexOf(".") != 0)
                 classLoader.addPackageLoadingFilter(
-                        transformerClassName.substring(0, transformerClassName.lastIndexOf('.')));
+                        transformerClassName.substring(
+                                0, transformerClassName.lastIndexOf('.')
+                        )
+                );
             else
                 classLoader.addClassLoadingFilter(transformerClassName);
         });
@@ -68,7 +89,9 @@ public class Trunk {
         List<String> unsupportedEntries = new ArrayList<>();
         List<String> missingEntries = new ArrayList<>();
 
-        for (String entry : System.getProperty("java.class.path").split(File.pathSeparator)) {
+        String[] classPathEntries = System.getProperty("java.class.path")
+                .split(File.pathSeparator);
+        for (String entry : classPathEntries) {
             if (entry.equals("*") || entry.endsWith(File.pathSeparator + "*")) {
                 unsupportedEntries.add(entry);
                 continue;
@@ -93,20 +116,15 @@ public class Trunk {
 
     private void launch(ArgumentMap argMap, EnvSide env) {
         try {
-            String mainClass = env.getLaunchClass();
-
-            // retrieve override
-            if (argMap.has("trunkMainClass"))
-                mainClass = argMap.getSingular("trunkMainClass");
-            else {
-                String prop = System.getProperty("trunk.mainClass");
-                if (prop != null)
-                    mainClass = prop;
-            }
+            String mainClass = argMap.get("trunkMainClass").orElseGet(env::getLaunchClass);
+            Optional<String> fromProperty = Optional.ofNullable(System.getProperty("trunk.mainClass"));
+            if (fromProperty.isPresent())
+                mainClass = fromProperty.get();
 
             Class<?> clz = Class.forName(mainClass, false, classLoader);
             MethodHandle handle = MethodHandles.publicLookup().findStatic(clz, "main",
                     MethodType.methodType(void.class, String[].class));
+            //noinspection ConfusingArgumentToVarargsMethod
             handle.invoke(argMap.toArray());
         } catch (Throwable t) {
             throw new RuntimeException("Failed to launch Minecraft!", t);

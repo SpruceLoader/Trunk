@@ -1,13 +1,16 @@
 plugins {
     java
     `maven-publish`
+    id("org.quiltmc.gradle.licenser") version "2.0.1"
 }
 
-group = extra["project.group"]?.toString() ?: throw IllegalArgumentException("The project group has not been set.")
-version = extra["project.version"]?.toString() ?: throw IllegalArgumentException("The project version has not been set.")
+group = extra["project.group"]?.toString()
+    ?: throw IllegalArgumentException("The project group has not been set.")
+version = extra["project.version"]?.toString()
+    ?: throw IllegalArgumentException("The project version has not been set.")
 
-val gitBranch = System.getenv("GITHUB_REF_NAME")
-val gitCommit = System.getenv("GITHUB_SHA")
+val gitBranch: String? = System.getenv("GITHUB_REF_NAME")
+val gitCommit: String? = System.getenv("GITHUB_SHA")
 if (gitBranch != null && gitCommit != null) {
     val shortenedCommit = gitCommit.substring(0, 7)
     version = "$version-SNAPSHOT+$gitBranch-$shortenedCommit"
@@ -24,20 +27,28 @@ dependencies {
     implementation("org.ow2.asm:asm-tree:9.4")
     implementation("net.fabricmc:tiny-mappings-parser:0.3.0+build.17")
 
-    compileOnly("org.apache.logging.log4j:log4j-api:2.8.1")
+    implementation("org.jetbrains:annotations:24.0.1")
+
     compileOnly("org.slf4j:slf4j-api:1.8.0-beta4")
 }
 
 java {
     withSourcesJar()
     withJavadocJar()
+
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(8))
+    }
+}
+
+license {
+    rule(file("codeformat/FILEHEADER"))
 }
 
 publishing {
     publications.create<MavenPublication>("mavenJava") {
-        artifactId =
-            extra["project.name"]?.toString()
-                ?: throw IllegalArgumentException("The project name has not been set.")
+        artifactId = extra["project.name"]?.toString()
+            ?: throw IllegalArgumentException("The project name has not been set.")
         groupId = project.group.toString()
         version = project.version.toString()
 
@@ -45,8 +56,10 @@ publishing {
     }
 
     repositories {
-        val publishingUsername = project.findProperty("spruceloader.publishing.username")?.toString() ?: System.getenv("SPRUCELOADER_PUBLISHING_USERNAME")
-        val publishingPassword = project.findProperty("spruceloader.publishing.password")?.toString() ?: System.getenv("SPRUCELOADER_PUBLISHING_PASSWORD")
+        val publishingUsername = project.findProperty("spruceloader.publishing.username")?.toString()
+            ?: System.getenv("SPRUCELOADER_PUBLISHING_USERNAME")
+        val publishingPassword = project.findProperty("spruceloader.publishing.password")?.toString()
+            ?: System.getenv("SPRUCELOADER_PUBLISHING_PASSWORD")
         if (publishingUsername != null && publishingPassword != null) {
             fun MavenArtifactRepository.applyCredentials() {
                 authentication.create<BasicAuthentication>("basic")
