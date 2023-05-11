@@ -55,10 +55,9 @@ public class TransformerManager implements Iterable<Transformer> {
                 name -> transformers.add(fromName(name)));
 
         String prop = System.getProperty(propName);
-        if (prop != null) {
-            Arrays.stream(prop.split("/"))
-                    .forEach(name -> transformers.add(fromName(name)));
-        }
+        if (prop != null)
+            Arrays.stream(prop.split("/")).forEach(
+                    name -> transformers.add(fromName(name)));
 
         transformers.removeIf(Objects::isNull);
         argMap.remove(argName);

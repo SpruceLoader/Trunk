@@ -28,9 +28,9 @@ public class ArgumentMap {
 
     public Optional<String> get(String key) {
         List<String> values = getAll(key);
-        if (values.isEmpty()) {
+        if (values.isEmpty())
             return Optional.empty();
-        }
+
         return Optional.ofNullable(values.get(values.size() - 1));
     }
 
@@ -40,7 +40,9 @@ public class ArgumentMap {
 
     public void putIfAbsent(String key, String value) {
         boolean has = has(key);
-        if (!has) markDirty();
+        if (!has)
+            markDirty();
+
         internalMap.putIfAbsent(key, new ArrayList<>(Collections.singletonList(value)));
     }
 
@@ -48,9 +50,9 @@ public class ArgumentMap {
         markDirty();
 
         List<String> values = getAll(key);
-        if (values == null) {
+        if (values == null)
             values = new ArrayList<>();
-        }
+
         values.add(value);
         internalMap.put(key, values);
     }
@@ -63,6 +65,7 @@ public class ArgumentMap {
     public String[] toArray() {
         if (!updated && asArray != null)
             return asArray;
+
         List<String> returnValue = new ArrayList<>();
         internalMap.forEach((key, value) -> value.forEach(item -> {
             returnValue.add("--" + key);

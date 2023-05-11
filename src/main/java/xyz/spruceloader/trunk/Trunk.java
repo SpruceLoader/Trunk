@@ -118,9 +118,8 @@ public class Trunk {
         try {
             String mainClass = argMap.get("trunkMainClass").orElseGet(env::getLaunchClass);
             Optional<String> fromProperty = Optional.ofNullable(System.getProperty("trunk.mainClass"));
-            if (fromProperty.isPresent()) {
+            if (fromProperty.isPresent())
                 mainClass = fromProperty.get();
-            }
 
             Class<?> clz = Class.forName(mainClass, false, classLoader);
             MethodHandle handle = MethodHandles.publicLookup().findStatic(clz, "main",
